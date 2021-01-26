@@ -1,12 +1,7 @@
 #include <glad/glad.h>
 #include <iostream>
 #include <glfw3.h>
-
-enum class SHADERTYPE
-{
-	VERTEX = 0,
-	FRAGMENT = 1
-};
+#include "Shader.h"
 
 //varibale declaration
 extern GLFWwindow* window = nullptr;
@@ -17,8 +12,6 @@ void init_glfw();
 bool init_window_and_context();
 void processInputs();
 void renderStuff();
-unsigned int getShaderProgram(const char* vertexCode, const char* fragmentCode);
-unsigned int setupShader(SHADERTYPE type, const char* shaderCode);
 
 int main() {
 	init_glfw();
@@ -66,22 +59,20 @@ bool init_window_and_context() {
 	return true;
 }
 void processInputs() {
+	static bool showWireFrame = true;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		showWireFrame = false;
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		showWireFrame = true;
+	}
 }
 void renderStuff() {
-	unsigned int shaderProgram, VAO, VBO;
-	const char* vertexShaderSource = "#version 440 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"void main() {"
-		"gl_Position = vec4(aPos, 1.0);\n"
-		"}\n\0";
-	const char* fragmentShaderSource = "#version 440 core\n"
-		"out vec4 FragColor;\n"
-		"void main() {\n"
-		"FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\n\0";
-	shaderProgram = getShaderProgram(vertexShaderSource, fragmentShaderSource);
+	Shader exampleShader("./shaders/Shader.vert", "./shaders/Fragment.frag");
 
 	const float vertices[] = {
 		-0.5f, -0.5f, 0.0f,
@@ -89,6 +80,7 @@ void renderStuff() {
 		 0.0f,  0.5f, 0.0f
 	};
 
+	unsigned int VAO, VBO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
@@ -131,7 +123,7 @@ void renderStuff() {
 		glClearColor(0, 0.5, 1, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
+		exampleShader.use();
 		glBindVertexArray(VAO2);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		
@@ -143,40 +135,4 @@ void renderStuff() {
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &VBO2);
 	glDeleteBuffers(1, &EBO2);
-	glDeleteProgram(shaderProgram);
-}
-
-unsigned int getShaderProgram(const char* vertexCode, const char* fragmentCode) {
-	unsigned int vertexShader = setupShader(SHADERTYPE::VERTEX, vertexCode);
-	unsigned int fragmentShader = setupShader(SHADERTYPE::FRAGMENT, fragmentCode);
-	unsigned int shaderProgramId = glCreateProgram();
-	glAttachShader(shaderProgramId, vertexShader);
-	glAttachShader(shaderProgramId, fragmentShader);
-	glLinkProgram(shaderProgramId);
-
-	int programLinkStatus;
-	glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &programLinkStatus);
-	if (programLinkStatus != GL_TRUE) {
-		char log[1024];
-		glGetProgramInfoLog(shaderProgramId, 1024, NULL, log);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << log << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-	return shaderProgramId;
-}
-
-unsigned int setupShader(SHADERTYPE type, const char* shaderCode) {
-	GLenum shaderType = (type == SHADERTYPE::VERTEX) ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
-	unsigned int shaderId = glCreateShader(shaderType);
-	glShaderSource(shaderId, 1, &shaderCode, NULL);
-	glCompileShader(shaderId);
-	int shaderStatus;
-	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &shaderStatus);
-	if (shaderStatus != GL_TRUE) {
-		char log[1024];
-		glGetShaderInfoLog(shaderId, 1024, NULL, log);
-		std::cout << "ERROR::SHADER::" << shaderType << "::COMPILATION_FAILED\n" << log << std::endl;
-	}
-	return shaderId;
 }
