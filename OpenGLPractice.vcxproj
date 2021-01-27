@@ -78,12 +78,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Dependencies\includes;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\GLFW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Dependencies\includes;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\GLFW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -148,6 +148,7 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Fragment.frag" />
@@ -155,6 +156,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\textures\grass.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
