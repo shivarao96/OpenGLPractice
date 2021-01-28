@@ -51,6 +51,9 @@ void Shader::setInt(const std::string& name, int val) const {
 void Shader::setFloat(const std::string& name, float value) const {
 	glUniform1f(glGetUniformLocation(shaderProgramId, name.c_str()), value);
 }
+void Shader::setMat4(const std::string& name, const glm::mat4& mat) {
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgramId, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
 
 unsigned int Shader::setUpShader(SHADERTYPE type, const char* shaderCode, const std::string& fileName) {
 	GLenum shaderType = (type == SHADERTYPE::VERTEX) ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
