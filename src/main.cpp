@@ -3,6 +3,9 @@
 #include <glfw3.h>
 #include "Shader.h"
 #include <stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 //varibale declaration
 extern GLFWwindow* window = nullptr;
@@ -14,6 +17,7 @@ bool init_window_and_context();
 void processInputs();
 void renderStuff();
 unsigned int getTextureId(const char* fileName);
+void setUpCoordsData(const float vertices[], const unsigned int indices[], unsigned int* VAO, unsigned int* VBO, unsigned int* EBO, int* valCheck);
 
 int main() {
 	init_glfw();
@@ -78,33 +82,15 @@ void renderStuff() {
 	unsigned int texture = getTextureId("./assets/textures/grass.png");
 	unsigned int face = getTextureId("./assets/textures/awesomeface.png");
 
-	const float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
-	};
-
-	unsigned int VAO, VBO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-	glEnableVertexAttribArray(0);
-
 	float vertices2[] = {
-		// positions          // colors           // texture coords
-		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, // top right
-		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // bottom right
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
-		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f  // top left 
+		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f 
 	};
-	unsigned int indices[] = {  // note that we start from 0!
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
+	unsigned int indices[] = {
+		0, 1, 3,
+		1, 2, 3 
 	};
 
 	unsigned int VAO2, VBO2, EBO2;
@@ -131,6 +117,12 @@ void renderStuff() {
 		glClearColor(0, 0.5, 1, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		glm::mat4 trans = glm::mat4(1.0f);
+		trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
+		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		exampleShader.setMat4("transform", trans);
+
 		exampleShader.use();
 		exampleShader.setInt("texture1", 0);
 		exampleShader.setInt("texture2", 1);
@@ -139,16 +131,13 @@ void renderStuff() {
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, face);
-		//exampleShader.use();
 		glBindVertexArray(VAO2);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-	glDeleteVertexArrays(1, &VAO);
 	glDeleteVertexArrays(1, &VAO2);
-	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &VBO2);
 	glDeleteBuffers(1, &EBO2);
 	glDeleteTextures(1, &texture);
@@ -179,4 +168,22 @@ unsigned int getTextureId(const char* fileName) {
 	}
 	stbi_image_free(imageData);
 	return texture;
+}
+void setUpCoordsData(const float vertices[], const unsigned int indices[], unsigned int* VAO, unsigned int* VBO, unsigned int* EBO, int* valCheck) {
+	glGenVertexArrays(1, VAO);
+	glBindVertexArray(*VAO);
+	glGenBuffers(1, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glGenBuffers(1, EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	*valCheck = 10;
 }
