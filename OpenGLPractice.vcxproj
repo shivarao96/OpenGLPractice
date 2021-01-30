@@ -151,6 +151,7 @@
     <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\coordinate_system.vert" />
     <None Include="shaders\Fragment.frag" />
     <None Include="shaders\Shader.vert" />
   </ItemGroup>
