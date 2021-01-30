@@ -34,11 +34,9 @@ Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath) {
 		setUpShaderProgram(vertexShaderId, fragmentShaderId);
 	}
 }
-
 Shader::~Shader() {
 	glDeleteProgram(shaderProgramId);
 }
-
 void Shader::use() {
 	glUseProgram(shaderProgramId);
 }
@@ -51,8 +49,23 @@ void Shader::setInt(const std::string& name, int val) const {
 void Shader::setFloat(const std::string& name, float value) const {
 	glUniform1f(glGetUniformLocation(shaderProgramId, name.c_str()), value);
 }
+void Shader::setMat2(const std::string& name, const glm::mat2& mat) {
+	glUniformMatrix2fv(glGetUniformLocation(shaderProgramId, name.c_str()), GL_FALSE, 1, &mat[0][0]);
+}
+void Shader::setMat3(const std::string& name, const glm::mat3& mat) {
+	glUniformMatrix3fv(glGetUniformLocation(shaderProgramId, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
 void Shader::setMat4(const std::string& name, const glm::mat4& mat) {
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgramId, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+void Shader::setVec2(const std::string& name, const glm::vec2& val) {
+	glUniform2fv(glGetUniformLocation(shaderProgramId, name.c_str()), 1, &val[0]);
+}
+void Shader::setVec3(const std::string& name, const glm::vec3& val) {
+	glUniform3fv(glGetUniformLocation(shaderProgramId, name.c_str()), 1, &val[0]);
+}
+void Shader::setVec4(const std::string& name, const glm::vec4& val) {
+	glUniform4fv(glGetUniformLocation(shaderProgramId, name.c_str()), 1, &val[0]);
 }
 
 unsigned int Shader::setUpShader(SHADERTYPE type, const char* shaderCode, const std::string& fileName) {
@@ -65,7 +78,7 @@ unsigned int Shader::setUpShader(SHADERTYPE type, const char* shaderCode, const 
 	if (shaderStatus != GL_TRUE) {
 		char log[1024];
 		glGetShaderInfoLog(shaderId, 1024, NULL, log);
-		std::cout << "ERROR::SHADER::"<< fileName <<"::COMPILATION_FAILED\n" << log << std::endl;
+		std::cout << "ERROR::SHADER::" << fileName << "::COMPILATION_FAILED\n" << log << std::endl;
 	}
 	return shaderId;
 }
@@ -85,7 +98,6 @@ void Shader::setUpShaderProgram(unsigned int vertexShader, unsigned int fragment
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 }
-
 bool Shader::checkShaderFile(const char* file) { // @TODO::move such functions in utility class
 	struct stat buffer;
 	if (stat(file, &buffer) != 0) {

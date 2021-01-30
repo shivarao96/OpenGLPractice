@@ -31,6 +31,7 @@
   <ItemGroup>
     <None Include="shaders\Shader.vert" />
     <None Include="shaders\Fragment.frag" />
+    <None Include="shaders\coordinate_system.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">

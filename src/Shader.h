@@ -25,6 +25,11 @@ public:
 	void setBool(const std::string& name, bool val) const;
 	void setInt(const std::string& name, int val) const;
 	void setFloat(const std::string& name, float value) const;
+	void setMat2(const std::string& name, const glm::mat2& mat);
+	void setMat3(const std::string& name, const glm::mat3& mat);
 	void setMat4(const std::string& name, const glm::mat4& mat);
+	void setVec2(const std::string& name, const glm::vec2& val);
+	void setVec3(const std::string& name, const glm::vec3& val);
+	void setVec4(const std::string& name, const glm::vec4& val);
 };
 
