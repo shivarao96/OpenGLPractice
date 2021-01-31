@@ -108,6 +108,12 @@ void processInputs() {
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		newCam.processKeyboard(CameraObject::CameraMovement::RIGHT, deltaTime);
 	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		newCam.processKeyboard(CameraObject::CameraMovement::UP, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		newCam.processKeyboard(CameraObject::CameraMovement::DOWN, deltaTime);
+	}
 }
 void renderStuff() {
 	Shader exampleShader("./shaders/Shader.vert", "./shaders/Fragment.frag");
