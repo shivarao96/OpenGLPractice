@@ -6,12 +6,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Camera.h"
 
 //varibale declaration
 extern GLFWwindow* window = nullptr;
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+CameraObject::Camera newCam(
+	glm::vec3(0.0f, 0.0f, 3.0f),
+	glm::vec3(0.0f, 1.0f, 0.0f)
+);
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -94,18 +96,23 @@ void processInputs() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		showWireFrame = true;
 	}
-	const float cameraSpeed = 3.5f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		cameraPos += cameraSpeed * cameraFront;
+		newCam.processKeyboard(CameraObject::CameraMovement::FORWARD, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		cameraPos -= cameraSpeed * cameraFront;
+		newCam.processKeyboard(CameraObject::CameraMovement::BACKWARD, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		newCam.processKeyboard(CameraObject::CameraMovement::LEFT, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		newCam.processKeyboard(CameraObject::CameraMovement::RIGHT, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		newCam.processKeyboard(CameraObject::CameraMovement::UP, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		newCam.processKeyboard(CameraObject::CameraMovement::DOWN, deltaTime);
 	}
 }
 void renderStuff() {
@@ -203,10 +210,10 @@ void renderStuff() {
 		glm::mat4 model = glm::mat4(1.0f);
 		
 		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		view = newCam.getViewMatrix();
 
 		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(newCam.getZoomVal()), 800.0f / 600.0f, 0.1f, 100.0f);
 
 		exampleShader.setMat4("model", model);
 		exampleShader.setMat4("view", view);
@@ -280,29 +287,8 @@ void mouseCallback(GLFWwindow* window, double xPos, double yPos) {
 	lastX = xPos;
 	lastY = yPos;
 
-	float sensitivity = 0.1f;
-	xOffset *= sensitivity;
-	yOffset *= sensitivity;
-
-	YAW += xOffset;
-	PITCH += yOffset;
-
-	if (PITCH > 89.0f)
-		PITCH = 89.0f;
-	if (PITCH < -89.0f)
-		PITCH = -89.0f;
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(YAW)) * cos(glm::radians(PITCH));
-	front.y = sin(glm::radians(PITCH));
-	front.z = sin(glm::radians(YAW)) * cos(glm::radians(PITCH));
-
-	cameraFront = glm::normalize(front);
+	newCam.processMouseMovement(xOffset, yOffset, true);
 }
 void mouseScrollBack(GLFWwindow* window, double xOffset, double yOffset) {
-	fov -= (float)(yOffset);
-	if (fov < 1.0f)
-		fov = 1.0f;
-	if (fov > 45.0f)
-		fov = 45.0f;
+	newCam.processMouseScroll((float)yOffset);
 }
