@@ -9,8 +9,20 @@
 
 //varibale declaration
 extern GLFWwindow* window = nullptr;
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-static bool isPerspective = true;
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+float YAW = -90.0f;
+float PITCH = 0.0f;
+float lastX = 400.0f;
+float lastY = 300.0f;
+float fov = 45.0f;
+bool isFirstMouseEvent = true;
+
 
 // func prototype
 void frame_buffer_window_callback(GLFWwindow* window, int width, int height);
@@ -19,6 +31,8 @@ bool init_window_and_context();
 void processInputs();
 void renderStuff();
 unsigned int getTextureId(const char* fileName);
+void mouseCallback(GLFWwindow* window, double xPos, double yPos);
+void mouseScrollBack(GLFWwindow* window, double xOffset, double yOffset);
 
 int main() {
 	init_glfw();
@@ -57,6 +71,9 @@ bool init_window_and_context() {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, frame_buffer_window_callback);
+	glfwSetCursorPosCallback(window, mouseCallback);
+	glfwSetScrollCallback(window, mouseScrollBack);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -77,11 +94,18 @@ void processInputs() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		showWireFrame = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
-		isPerspective = false;
+	const float cameraSpeed = 3.5f * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		cameraPos += cameraSpeed * cameraFront;
 	}
-	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-		isPerspective = true;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		cameraPos -= cameraSpeed * cameraFront;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	}
 }
 void renderStuff() {
@@ -145,10 +169,6 @@ void renderStuff() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
 
-	/*glGenBuffers(1, &EBO2);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);*/
-
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// color attribute
@@ -172,23 +192,21 @@ void renderStuff() {
 
 	while (!glfwWindowShouldClose(window))
 	{
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		processInputs();
 		glClearColor(0, 0.5, 1, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
+		
 		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		glm::mat4 projection = glm::mat4(1.0f);
-		if (isPerspective) {
-			projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-		}
-		else {
-			projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-		}
+		projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
 
 		exampleShader.setMat4("model", model);
 		exampleShader.setMat4("view", view);
@@ -248,4 +266,43 @@ unsigned int getTextureId(const char* fileName) {
 	}
 	stbi_image_free(imageData);
 	return texture;
+}
+
+void mouseCallback(GLFWwindow* window, double xPos, double yPos) {
+	if (isFirstMouseEvent) {
+		lastX = xPos;
+		lastY = yPos;
+		isFirstMouseEvent = false;
+	}
+
+	float xOffset = xPos - lastX;
+	float yOffset = lastY - yPos;
+	lastX = xPos;
+	lastY = yPos;
+
+	float sensitivity = 0.1f;
+	xOffset *= sensitivity;
+	yOffset *= sensitivity;
+
+	YAW += xOffset;
+	PITCH += yOffset;
+
+	if (PITCH > 89.0f)
+		PITCH = 89.0f;
+	if (PITCH < -89.0f)
+		PITCH = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(YAW)) * cos(glm::radians(PITCH));
+	front.y = sin(glm::radians(PITCH));
+	front.z = sin(glm::radians(YAW)) * cos(glm::radians(PITCH));
+
+	cameraFront = glm::normalize(front);
+}
+void mouseScrollBack(GLFWwindow* window, double xOffset, double yOffset) {
+	fov -= (float)(yOffset);
+	if (fov < 1.0f)
+		fov = 1.0f;
+	if (fov > 45.0f)
+		fov = 45.0f;
 }
