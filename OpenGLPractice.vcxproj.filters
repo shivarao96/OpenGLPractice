@@ -37,7 +37,10 @@
   <ItemGroup>
     <None Include="shaders\Shader.vert" />
     <None Include="shaders\Fragment.frag" />
-    <None Include="shaders\coordinate_system.vert" />
+    <None Include="shaders\container.vert" />
+    <None Include="shaders\container.frag" />
+    <None Include="shaders\light.vert" />
+    <None Include="shaders\light.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">

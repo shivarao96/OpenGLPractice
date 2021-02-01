@@ -153,8 +153,11 @@
     <ClCompile Include="src\TextureHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\coordinate_system.vert" />
+    <None Include="shaders\container.frag" />
+    <None Include="shaders\container.vert" />
     <None Include="shaders\Fragment.frag" />
+    <None Include="shaders\light.frag" />
+    <None Include="shaders\light.vert" />
     <None Include="shaders\Shader.vert" />
   </ItemGroup>
   <ItemGroup>
