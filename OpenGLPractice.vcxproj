@@ -150,6 +150,7 @@
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
+    <ClCompile Include="src\TextureHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\coordinate_system.vert" />
@@ -159,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\TextureHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\grass.png" />

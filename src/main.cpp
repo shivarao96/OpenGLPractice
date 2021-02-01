@@ -2,11 +2,8 @@
 #include <iostream>
 #include <glfw3.h>
 #include "Shader.h"
-#include <stb_image.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include "Camera.h"
+#include "TextureHandler.h"
 
 //varibale declaration
 extern GLFWwindow* window = nullptr;
@@ -17,14 +14,9 @@ CameraObject::Camera newCam(
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-
-float YAW = -90.0f;
-float PITCH = 0.0f;
 float lastX = 400.0f;
 float lastY = 300.0f;
-float fov = 45.0f;
 bool isFirstMouseEvent = true;
-
 
 // func prototype
 void frame_buffer_window_callback(GLFWwindow* window, int width, int height);
@@ -32,7 +24,7 @@ void init_glfw();
 bool init_window_and_context();
 void processInputs();
 void renderStuff();
-unsigned int getTextureId(const char* fileName);
+//unsigned int getTextureId(const char* fileName);
 void mouseCallback(GLFWwindow* window, double xPos, double yPos);
 void mouseScrollBack(GLFWwindow* window, double xOffset, double yOffset);
 
@@ -117,8 +109,9 @@ void processInputs() {
 }
 void renderStuff() {
 	Shader exampleShader("./shaders/Shader.vert", "./shaders/Fragment.frag");
-	unsigned int texture = getTextureId("./assets/textures/grass.png");
-	unsigned int face = getTextureId("./assets/textures/awesomeface.png");
+	TextureHandler texture("./assets/textures/grass.png", false);
+	TextureHandler wall("./assets/textures/wall.jpg", false);
+	TextureHandler face("./assets/textures/awesomeface.png", true);
 
 	float vertices2[] = {
 	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -223,14 +216,20 @@ void renderStuff() {
 		exampleShader.setInt("texture1", 0);
 		exampleShader.setInt("texture2", 1);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, face);
+		glBindTexture(GL_TEXTURE_2D, face.getTextureId());
 
 		glBindVertexArray(VAO2);
 		
 		for (int i = 0; i < 10; i++) {
+			if (i % 2 == 0) {
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, texture.getTextureId());
+			}
+			else {
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, wall.getTextureId());
+			}
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, cubsPositions[i]);
 			float angle = 20.0f * i;
@@ -245,36 +244,7 @@ void renderStuff() {
 	glDeleteVertexArrays(1, &VAO2);
 	glDeleteBuffers(1, &VBO2);
 	glDeleteBuffers(1, &EBO2);
-	glDeleteTextures(1, &texture);
-	glDeleteTextures(1, &face);
 }
-
-unsigned int getTextureId(const char* fileName) {
-	stbi_set_flip_vertically_on_load(true);
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	//..::set texture filtering and wrapping option::..//
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	int width, height, nrChannels;
-	unsigned char* imageData = stbi_load(fileName, &width, &height, &nrChannels, 0);
-	/*
-		very important GL_RGB is for JPEG/jpg and GL_RGBA is for PNG/png
-	*/
-	if (imageData) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cout << "Failed to load image::" << fileName << std::endl;
-	}
-	stbi_image_free(imageData);
-	return texture;
-}
-
 void mouseCallback(GLFWwindow* window, double xPos, double yPos) {
 	if (isFirstMouseEvent) {
 		lastX = xPos;
