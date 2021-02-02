@@ -205,8 +205,21 @@ void renderStuff() {
 		//..::Container handling::..//
 		containerShader.use();
 		containerShader.setVec3("lightPos", lightPos);
+		
+		containerShader.setVec3("light.position", lightPos);
+		containerShader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		containerShader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+		containerShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+
 		containerShader.setVec3("viewPos", newCam.getPosition());
 		containerShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		containerShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+		// container material setup
+		containerShader.setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+		containerShader.setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+		containerShader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		containerShader.setFloat("material.shininess", 32.0f);
 		containerShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
 		glm::mat4 containerModel = glm::mat4(1.0f);
 		containerShader.setMat4("model", containerModel);
