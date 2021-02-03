@@ -116,53 +116,68 @@ void renderStuff() {
 	TextureHandler texture("./assets/textures/grass.png", false);
 	TextureHandler wall("./assets/textures/wall.jpg", false);
 	TextureHandler face("./assets/textures/awesomeface.png", true);
+	TextureHandler woodenContainer("./assets/textures/container2.png", false);
+	TextureHandler woodenContainerBorder("./assets/textures/container2_specular.png", false);
 
 	float vertices2[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 	unsigned int indices[] = {
 		0, 1, 3,
 		1, 2, 3 
+	};
+
+	glm::vec3 cubePositions[] = {
+		  glm::vec3(0.0f,  0.0f,  0.0f),
+		  glm::vec3(2.0f,  5.0f, -15.0f),
+		  glm::vec3(-1.5f, -2.2f, -2.5f),
+		  glm::vec3(-3.8f, -2.0f, -12.3f),
+		  glm::vec3(2.4f, -0.4f, -3.5f),
+		  glm::vec3(-1.7f,  3.0f, -7.5f),
+		  glm::vec3(1.3f, -2.0f, -2.5f),
+		  glm::vec3(1.5f,  2.0f, -2.5f),
+		  glm::vec3(1.5f,  0.2f, -1.5f),
+		  glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
 	unsigned int VAO2, VBO2, EBO2;
@@ -173,18 +188,22 @@ void renderStuff() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	// Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	// Normal attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	// Texture attributes
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	unsigned int lightVAO;
 	glGenVertexArrays(1, &lightVAO);
 	glBindVertexArray(lightVAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	glEnable(GL_DEPTH_TEST);
@@ -196,51 +215,66 @@ void renderStuff() {
 		lastFrame = currentFrame;
 
 		processInputs();
-		glClearColor(0, 0, 0, 1);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 commonView = newCam.getViewMatrix();
 		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), 800.0f / 600.0f, 0.1f, 100.0f);;
-
-		//..::Container handling::..//
-		containerShader.use();
-		containerShader.setVec3("lightPos", lightPos);
-		
-		containerShader.setVec3("light.position", lightPos);
-		containerShader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-		containerShader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-		containerShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-
-		containerShader.setVec3("viewPos", newCam.getPosition());
-		containerShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		containerShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-		// container material setup
-		containerShader.setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-		containerShader.setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-		containerShader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-		containerShader.setFloat("material.shininess", 32.0f);
-		containerShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-		glm::mat4 containerModel = glm::mat4(1.0f);
-		containerShader.setMat4("model", containerModel);
-		containerShader.setMat4("view", commonView);
-		containerShader.setMat4("projection", commonProjection);
-
-		glBindVertexArray(VAO2);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		//..::light container::..//
 		lightShader.use();
 		glm::mat4 lightModel = glm::mat4(1.0f);
 		lightModel = glm::translate(lightModel, lightPos);
 		lightModel = glm::scale(lightModel, glm::vec3(0.25f));
+		lightModel = glm::rotate(lightModel, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.2f, 1.0f, 0.3f));
 		lightShader.setMat4("model", lightModel);
 		lightShader.setMat4("view", commonView);
 		lightShader.setMat4("projection", commonProjection);
 		lightShader.setVec3("lightColor", glm::vec3(1,1,1));
-
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		//..::Container handling::..//
+		containerShader.use();
+		containerShader.setVec3("lightPos", lightPos);
+
+		containerShader.setVec3("light.position", newCam.getPosition());
+		containerShader.setVec3("light.direction", newCam.getFront());
+		containerShader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		containerShader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+		containerShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		containerShader.setFloat("light.constant", 1.0f);
+		containerShader.setFloat("light.linear", 0.09f);
+		containerShader.setFloat("light.quadratic", 0.032f);
+		containerShader.setFloat("light.cuttOff", glm::cos(glm::radians(12.5f)));
+		containerShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5)));
+
+		containerShader.setVec3("viewPos", newCam.getPosition());
+		containerShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		containerShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+		containerShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+		containerShader.setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+		containerShader.setFloat("material.shininess", 32.0f);
+		containerShader.setInt("material.diffuse", 0);
+		containerShader.setInt("material.specular", 1);
+
+		glm::mat4 containerModel = glm::mat4(1.0f);
+		//containerShader.setMat4("model", containerModel);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, woodenContainer.getTextureId());
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, woodenContainerBorder.getTextureId());
+
+		for (unsigned int i = 0; i < 10; i++) {
+			containerModel = glm::translate(containerModel, cubePositions[i]);
+			float angle = 20 * i;
+			containerModel = glm::rotate(containerModel, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			containerShader.setMat4("model", containerModel);
+			containerShader.setMat4("view", commonView);
+			containerShader.setMat4("projection", commonProjection);
+			glBindVertexArray(VAO2);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

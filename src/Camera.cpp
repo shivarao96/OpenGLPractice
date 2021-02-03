@@ -112,3 +112,6 @@ float CameraObject::Camera::getSpeed() const {
 const glm::vec3 CameraObject::Camera::getPosition() const {
 	return m_Position;
 }
+const glm::vec3 CameraObject::Camera::getFront() const {
+	return m_Front;
+}
