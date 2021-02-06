@@ -41,6 +41,8 @@
     <None Include="shaders\container.frag" />
     <None Include="shaders\light.vert" />
     <None Include="shaders\light.frag" />
+    <None Include="shaders\Model.vert" />
+    <None Include="shaders\Model.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">

@@ -49,14 +49,16 @@ void CameraObject::Camera::processMouseMovement(float xOffSet, float yOffSet, bo
 	xOffSet *= m_Sensitivity;
 	yOffSet *= m_Sensitivity;
 
-	m_Yaw += xOffSet;
+	m_Yaw -= xOffSet;
 	m_Pitch += yOffSet;
 
 	if (constrainPitch) {
-		if (m_Pitch > 89.0f)
+		if (m_Pitch > 89.0f) {
 			m_Pitch = 89.0f;
-		if (m_Pitch < -89.0f)
+		}
+		if (m_Pitch < -89.0f) {
 			m_Pitch = -89.0f;
+		}
 	}
 	updateCameraVectors();
 }
