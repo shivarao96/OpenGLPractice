@@ -10,7 +10,7 @@ namespace Mesh {
 	{
 		glm::vec3 vertices;
 		glm::vec3 normal;
-		glm::vec3 texCoords;
+		glm::vec2 texCoords;
 		glm::vec3 tangent;
 		glm::vec3 bitTangent;
 	};

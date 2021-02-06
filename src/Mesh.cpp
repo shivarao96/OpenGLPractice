@@ -25,7 +25,19 @@ void Mesh::MeshConfig::drawMesh(Shader& shader) {
 
 	for (int i = 0; i < this->m_textures.size(); i++) {
 		glActiveTexture(GL_TEXTURE0 + i);
-		//shader.setFloat("", i);
+		std::string number;
+		std::string name = this->m_textures[i].type;
+
+		if (name == "texture_diffuse")
+			name = std::to_string(nrDiffuse++);
+		if(name == "texture_specular")
+			name = std::to_string(nrSpecular++);
+		if(name == "texture_normal")
+			name = std::to_string(nrNormal++);
+		if(name == "texture_height")
+			name = std::to_string(nrheight++);
+
+		shader.setFloat((name+number).c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, this->m_textures[i].id);
 	}
 	glBindVertexArray(this->m_VAO);
