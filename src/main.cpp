@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "TextureHandler.h"
+#include "Mesh.h"
 
 //varibale declaration
 extern GLFWwindow* window = nullptr;
