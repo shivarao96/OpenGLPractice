@@ -47,8 +47,7 @@ struct PointLight {
 	float quadratic;
 };
 
-#define NR_POINT_LIGHTS 4  
-uniform PointLight pointLights[NR_POINT_LIGHTS];
+uniform PointLight pointLights;
 
 struct SpotLight {
 	vec3 direction;
@@ -138,9 +137,7 @@ void main () {
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
 	vec3 result = calDirectionLight(dirLight, norm, viewDir);
-	for(int i = 0; i < NR_POINT_LIGHTS; i++) {
-		result += calPointLight(pointLights[0], norm, FragPos, viewDir);
-	}
+	result += calPointLight(pointLights, norm, FragPos, viewDir);
 	result += calSpotLight(sptLight, norm, FragPos, viewDir);
 	FragColor = vec4(result, 1.0);
 }
