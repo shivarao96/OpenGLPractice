@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "TextureHandler.h"
+#include "Model.h"
 
 //varibale declaration
 extern GLFWwindow* window = nullptr;
@@ -113,88 +114,9 @@ void processInputs() {
 	}
 }
 void renderStuff() {
-	Shader containerShader("./shaders/container.vert", "./shaders/container.frag");
-	Shader lightShader("./shaders/light.vert", "./shaders/light.frag");
-	
-	TextureHandler texture("./assets/textures/grass.png", false);
-	TextureHandler wall("./assets/textures/wall.jpg", false);
-	TextureHandler face("./assets/textures/awesomeface.png", true);
-	TextureHandler woodenContainer("./assets/textures/container2.png", false);
-	TextureHandler woodenContainerBorder("./assets/textures/container2_specular.png", false);
 
-	float vertices2[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-	};
-	unsigned int indices[] = {
-		0, 1, 3,
-		1, 2, 3 
-	};
-
-	unsigned int VAO2, VBO2, EBO2;
-	glGenVertexArrays(1, &VAO2);
-	glBindVertexArray(VAO2);
-
-	glGenBuffers(1, &VBO2);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-
-	// Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// Normal attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// Texture attributes
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	unsigned int lightVAO;
-	glGenVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	Shader modelShader("./shaders/Model.vert", "./shaders/Model.frag");
+	Model exampleModel("./assets/objects/nanosuit/nanosuit.obj");
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -205,90 +127,27 @@ void renderStuff() {
 		lastFrame = currentFrame;
 
 		processInputs();
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		//glClearColor(1.0f, 0.5f, 0.0f, 0.0f);
+		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 commonView = newCam.getViewMatrix();
 		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), screenWidth / screenHeight, 0.1f, 100.0f);;
 
-		//..::light container::..//
-		lightShader.use();
-		glm::mat4 lightModel = glm::mat4(1.0f);
-		lightModel = glm::translate(lightModel, lightPos);
-		lightModel = glm::scale(lightModel, glm::vec3(0.25f));
-		lightModel = glm::rotate(lightModel, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.2f, 1.0f, 0.3f));
-		lightShader.setMat4("model", lightModel);
-		lightShader.setMat4("view", commonView);
-		lightShader.setMat4("projection", commonProjection);
-		lightShader.setVec3("lightColor", glm::vec3(1,1,1));
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		modelShader.use();
 
-		//..::Container handling::..//
-		containerShader.use();
-		containerShader.setVec3("lightPos", lightPos);
-		containerShader.setVec3("light.position", newCam.getPosition());
-		containerShader.setVec3("light.direction", newCam.getFront());
-		containerShader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-		containerShader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-		containerShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-		containerShader.setFloat("light.constant", 1.0f);
-		containerShader.setFloat("light.linear", 0.09f);
-		containerShader.setFloat("light.quadratic", 0.032f);
-		containerShader.setFloat("light.cuttOff", glm::cos(glm::radians(12.5f)));
-		containerShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5)));
+		modelShader.setMat4("view", commonView);
+		modelShader.setMat4("projection", commonProjection);
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		modelShader.setMat4("model", model);
 
-		//..::Container Direction light::..//
-		containerShader.setVec3("dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-		containerShader.setVec3("dirLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-		containerShader.setVec3("dirLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-		containerShader.setVec3("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-		//..::Container Point light::..//
-		containerShader.setVec3("pointLights.position", lightPos);
-		containerShader.setVec3("pointLights.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-		containerShader.setVec3("pointLights.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-		containerShader.setVec3("pointLights.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-		containerShader.setFloat("pointLights.constant", 1.0f);
-		containerShader.setFloat("pointLights.linear", 0.09);
-		containerShader.setFloat("pointLights.quadratic", 0.032);
+		exampleModel.drawModel(modelShader);
 
-		containerShader.setVec3("sptLight.position", newCam.getPosition());
-		containerShader.setVec3("sptLight.direction", newCam.getFront());
-		containerShader.setVec3("sptLight.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-		containerShader.setVec3("sptLight.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-		containerShader.setVec3("sptLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-		containerShader.setFloat("sptLight.constant", 1.0f);
-		containerShader.setFloat("sptLight.linear", 0.09);
-		containerShader.setFloat("sptLight.quadratic", 0.032);
-		containerShader.setFloat("sptLight.cuttOff", glm::cos(glm::radians(12.5f)));
-		containerShader.setFloat("sptLight.outerCutOff", glm::cos(glm::radians(17.5)));
-
-
-		containerShader.setVec3("viewPos", newCam.getPosition());
-		containerShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		containerShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-		containerShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-		containerShader.setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-		containerShader.setFloat("material.shininess", 32.0f);
-		containerShader.setInt("material.diffuse", 0);
-		containerShader.setInt("material.specular", 1);
-
-		glm::mat4 containerModel = glm::mat4(1.0f);
-		containerShader.setMat4("model", containerModel);
-		containerShader.setMat4("view", commonView);
-		containerShader.setMat4("projection", commonProjection);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, woodenContainer.getTextureId());
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, woodenContainerBorder.getTextureId());
-		glBindVertexArray(VAO2);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-	glDeleteVertexArrays(1, &VAO2);
-	glDeleteBuffers(1, &VBO2);
-	glDeleteBuffers(1, &EBO2);
 }
 void mouseCallback(GLFWwindow* window, double xPos, double yPos) {
 	if (isFirstMouseEvent) {
