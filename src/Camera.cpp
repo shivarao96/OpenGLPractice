@@ -49,7 +49,7 @@ void CameraObject::Camera::processMouseMovement(float xOffSet, float yOffSet, bo
 	xOffSet *= m_Sensitivity;
 	yOffSet *= m_Sensitivity;
 
-	m_Yaw -= xOffSet;
+	m_Yaw += xOffSet;
 	m_Pitch += yOffSet;
 
 	if (constrainPitch) {
@@ -99,9 +99,9 @@ void CameraObject::Camera::updateCameraVectors() {
 	glm::vec3 front;
 	front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 	front.y = sin(glm::radians(m_Pitch));
-	front.z = sin(glm::radians(m_Yaw)) * acosl(glm::radians(m_Pitch));
+	front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 	m_Front = front;
-	m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
+	m_Right = glm::normalize(glm::cross(m_WorldUp, m_Front));
 	m_Up = glm::normalize(glm::cross(m_Front, m_Right));
 }
 

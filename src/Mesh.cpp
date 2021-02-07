@@ -1,5 +1,7 @@
 #include "Mesh.h"
 #include <glad/glad.h>
+#include <iostream>
+
 
 Mesh::MeshConfig::MeshConfig(
 	std::vector<VertexInfo> vertices,
@@ -29,19 +31,21 @@ void Mesh::MeshConfig::drawMesh(Shader& shader) {
 		std::string name = this->m_textures[i].type;
 
 		if (name == "texture_diffuse")
-			name = std::to_string(nrDiffuse++);
+			number = std::to_string(nrDiffuse++);
 		if(name == "texture_specular")
-			name = std::to_string(nrSpecular++);
+			number = std::to_string(nrSpecular++);
 		if(name == "texture_normal")
-			name = std::to_string(nrNormal++);
+			number = std::to_string(nrNormal++);
 		if(name == "texture_height")
-			name = std::to_string(nrheight++);
+			number = std::to_string(nrheight++);
 
-		shader.setFloat((name+number).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, this->m_textures[i].id);
+		shader.setInt((name + number).c_str(), i);
+		glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
 	}
 	glBindVertexArray(this->m_VAO);
 	glDrawElements(GL_TRIANGLES, this->m_indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void Mesh::MeshConfig::setupMesh() {
@@ -58,7 +62,7 @@ void Mesh::MeshConfig::setupMesh() {
 	glBufferData(
 		GL_ARRAY_BUFFER,
 		this->m_vertices.size() * sizeof(VertexInfo),
-		&this->m_vertices[0],
+		&m_vertices[0],
 		GL_STATIC_DRAW
 	);
 
@@ -69,7 +73,7 @@ void Mesh::MeshConfig::setupMesh() {
 	glBufferData(
 		GL_ELEMENT_ARRAY_BUFFER, 
 		this->m_indices.size() * sizeof(unsigned int), 
-		&this->m_indices[0], 
+		&m_indices[0], 
 		GL_STATIC_DRAW
 	);
 
