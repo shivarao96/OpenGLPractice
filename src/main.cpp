@@ -4,7 +4,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "TextureHandler.h"
-#include "Model.h"
+#include "Mesh.h"
 
 //varibale declaration
 extern GLFWwindow* window = nullptr;
@@ -30,9 +30,10 @@ void init_glfw();
 bool init_window_and_context();
 void processInputs();
 void renderStuff();
-//unsigned int getTextureId(const char* fileName);
 void mouseCallback(GLFWwindow* window, double xPos, double yPos);
 void mouseScrollBack(GLFWwindow* window, double xOffset, double yOffset);
+Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures);
+Mesh::MeshConfig* drawPlane(std::vector<Mesh::TextureInfo> textures);
 
 int main() {
 	init_glfw();
@@ -115,8 +116,23 @@ void processInputs() {
 }
 void renderStuff() {
 
-	Shader modelShader("./shaders/Model.vert", "./shaders/Model.frag");
-	Model exampleModel("./assets/objects/nanosuit/nanosuit.obj");
+	//..cube mesh
+	Shader cubeShader("./shaders/Model.vert", "./shaders/Model.frag");
+	std::vector<Mesh::TextureInfo> cubeTextures;
+	Mesh::TextureInfo cubeTexture1;
+	cubeTexture1.texture = new TextureHandler("./assets/textures/marble.jpg", false);
+	cubeTexture1.type = "texture_diffuse";
+	cubeTextures.push_back(cubeTexture1);
+	Mesh::MeshConfig* cubeMesh = drawCube(cubeTextures);
+
+	//..Plane mesh
+	Shader planeShader("./shaders/Model.vert", "./shaders/Model.frag");
+	std::vector<Mesh::TextureInfo> planeTextures;
+	Mesh::TextureInfo planeTexture1;
+	planeTexture1.texture = new TextureHandler("./assets/textures/metal.png", false);
+	planeTexture1.type = "texture_diffuse";
+	planeTextures.push_back(planeTexture1);
+	Mesh::MeshConfig* planeMesh = drawPlane(planeTextures);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -127,26 +143,44 @@ void renderStuff() {
 		lastFrame = currentFrame;
 
 		processInputs();
-		//glClearColor(1.0f, 0.5f, 0.0f, 0.0f);
-		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+		glClearColor(1.0f, 0.5f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 commonView = newCam.getViewMatrix();
-		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), screenWidth / screenHeight, 0.1f, 100.0f);;
+		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), screenWidth / screenHeight, 0.1f, 100.0f);
 
-		modelShader.use();
-
-		modelShader.setMat4("view", commonView);
-		modelShader.setMat4("projection", commonProjection);
+		//..render cube
+		cubeShader.use();
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-		modelShader.setMat4("model", model);
+		model = glm::translate(model, glm::vec3(0, 0, -2));
+		cubeShader.setMat4("model", model);
+		cubeShader.setMat4("view", commonView);
+		cubeShader.setMat4("projection", commonProjection);
+		cubeMesh->drawMesh(cubeShader);
 
-		exampleModel.drawModel(modelShader);
+		model = glm::translate(model, glm::vec3(2, 0, 2));
+		cubeShader.setMat4("model", model);
+		cubeMesh->drawMesh(cubeShader);
+
+		//..render plane
+		planeShader.use();
+		model = glm::translate(model, glm::vec3(0, 0, 0));
+		planeShader.setMat4("model", model);
+		planeShader.setMat4("view", commonView);
+		planeShader.setMat4("projection", commonProjection);
+		planeMesh->drawMesh(planeShader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+	}
+
+	delete cubeMesh;
+	for (unsigned int i = 0; i < cubeTextures.size(); i++) {
+		delete cubeTextures[i].texture;
+	}
+	delete planeMesh;
+	for (unsigned int i = 0; i < planeTextures.size(); i++) {
+		delete planeTextures[i].texture;
 	}
 }
 void mouseCallback(GLFWwindow* window, double xPos, double yPos) {
@@ -165,4 +199,218 @@ void mouseCallback(GLFWwindow* window, double xPos, double yPos) {
 }
 void mouseScrollBack(GLFWwindow* window, double xOffset, double yOffset) {
 	newCam.processMouseScroll((float)yOffset);
+}
+Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures) {
+	float cubePosition[] = {
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+
+		-0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f,
+
+		-0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f
+	};
+	float cubeNormals[] = {
+		
+		0.0f,  0.0f, -1.0f,
+		0.0f,  0.0f, -1.0f,
+		0.0f,  0.0f, -1.0f,
+		0.0f,  0.0f, -1.0f,
+		0.0f,  0.0f, -1.0f,
+		0.0f,  0.0f, -1.0f,
+
+		0.0f,  0.0f,  1.0f,
+		0.0f,  0.0f,  1.0f,
+		0.0f,  0.0f,  1.0f,
+		0.0f,  0.0f,  1.0f,
+		0.0f,  0.0f,  1.0f,
+		0.0f,  0.0f,  1.0f,
+
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+
+		0.0f, -1.0f,  0.0f,
+		0.0f, -1.0f,  0.0f,
+		0.0f, -1.0f,  0.0f,
+		0.0f, -1.0f,  0.0f,
+		0.0f, -1.0f,  0.0f,
+		0.0f, -1.0f,  0.0f,
+
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f
+	};
+	float cubeTextures[] = {
+		0.0f,  0.0f,
+		1.0f,  0.0f,
+		1.0f,  1.0f,
+		1.0f,  1.0f,
+		0.0f,  1.0f,
+		0.0f,  0.0f,
+
+		0.0f,  0.0f,
+		1.0f,  0.0f,
+		1.0f,  1.0f,
+		1.0f,  1.0f,
+		0.0f,  1.0f,
+		0.0f,  0.0f,
+
+		1.0f,  0.0f,
+		1.0f,  1.0f,
+		0.0f,  1.0f,
+		0.0f,  1.0f,
+		0.0f,  0.0f,
+		1.0f,  0.0f,
+
+		1.0f,  0.0f,
+		1.0f,  1.0f,
+		0.0f,  1.0f,
+		0.0f,  1.0f,
+		0.0f,  0.0f,
+		1.0f,  0.0f,
+
+		0.0f,  1.0f,
+		1.0f,  1.0f,
+		1.0f,  0.0f,
+		1.0f,  0.0f,
+		0.0f,  0.0f,
+		0.0f,  1.0f,
+
+		0.0f,  1.0f,
+		1.0f,  1.0f,
+		1.0f,  0.0f,
+		1.0f,  0.0f,
+		0.0f,  0.0f,
+		0.0f,  1.0f
+	};
+	std::vector<Mesh::VertexInfo> vertices;
+	std::vector<unsigned int> indices;
+
+	for (unsigned int i = 0; i < 36; i++) {
+		Mesh::VertexInfo vTemp;
+		int tempIndex = i * 3;
+		int tempTextIndex = i * 2;
+		vTemp.vertices = glm::vec3(
+			cubePosition[tempIndex],
+			cubePosition[tempIndex + 1],
+			cubePosition[tempIndex + 2]
+		);
+		vTemp.normal = glm::vec3(
+			cubeNormals[tempIndex],
+			cubeNormals[tempIndex + 1],
+			cubeNormals[tempIndex + 2]
+		);
+		vTemp.texCoords = glm::vec2(
+			cubeTextures[tempTextIndex],
+			cubeTextures[tempTextIndex + 1]
+		);
+		vTemp.tangent = glm::vec3(0);
+		vTemp.bitTangent = glm::vec3(0);
+
+		vertices.push_back(vTemp);
+	}
+
+	return new Mesh::MeshConfig(
+		vertices,
+		indices,
+		textures
+	);
+}
+
+Mesh::MeshConfig* drawPlane(std::vector<Mesh::TextureInfo> textures) {
+	std::vector<Mesh::VertexInfo> vertices;
+	std::vector<unsigned int> indices;
+
+	float planePosition[] = {
+		5.0f, -0.5f,  5.0f,
+	   -5.0f, -0.5f,  5.0f,
+	   -5.0f, -0.5f, -5.0f,
+
+		5.0f, -0.5f,  5.0f,
+	   -5.0f, -0.5f, -5.0f,
+		5.0f, -0.5f, -5.0f
+	};
+
+	float planeTexture[] = {
+		2.0f, 0.0f,
+		0.0f, 0.0f,
+		0.0f, 2.0f,
+
+		2.0f, 0.0f,
+		0.0f, 2.0f,
+		2.0f, 2.0f
+	};
+
+	for (unsigned int i = 0; i < 6; i++) {
+		Mesh::VertexInfo vTemp;
+		int tempIndex = i * 3;
+		int tempTextIndex = i * 2;
+		vTemp.vertices = glm::vec3(
+			planePosition[tempIndex],
+			planePosition[tempIndex + 1],
+			planePosition[tempIndex + 2]
+		);
+		vTemp.texCoords = glm::vec2(
+			planeTexture[tempTextIndex],
+			planeTexture[tempTextIndex + 1]
+		);
+		vTemp.normal = glm::vec3(0);
+		vTemp.tangent = glm::vec3(0);
+		vTemp.bitTangent = glm::vec3(0);
+		vertices.push_back(vTemp);
+	}
+
+	return new Mesh::MeshConfig(
+		vertices,
+		indices,
+		textures
+	);
 }

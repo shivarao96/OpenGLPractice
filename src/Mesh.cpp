@@ -43,7 +43,12 @@ void Mesh::MeshConfig::drawMesh(Shader& shader) {
 		glBindTexture(GL_TEXTURE_2D, m_textures[i].texture->getTextureId());
 	}
 	glBindVertexArray(this->m_VAO);
-	glDrawElements(GL_TRIANGLES, this->m_indices.size(), GL_UNSIGNED_INT, 0);
+	if (m_indices.size()) {
+		glDrawElements(GL_TRIANGLES, this->m_indices.size(), GL_UNSIGNED_INT, 0);
+	}
+	else {
+		glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
+	}
 	glBindVertexArray(0);
 	glActiveTexture(GL_TEXTURE0);
 }
@@ -66,16 +71,18 @@ void Mesh::MeshConfig::setupMesh() {
 		GL_STATIC_DRAW
 	);
 
-	glBindBuffer(
-		GL_ELEMENT_ARRAY_BUFFER, 
-		this->m_EBO
-	);
-	glBufferData(
-		GL_ELEMENT_ARRAY_BUFFER, 
-		this->m_indices.size() * sizeof(unsigned int), 
-		&m_indices[0], 
-		GL_STATIC_DRAW
-	);
+	if (m_indices.size()) {
+		glBindBuffer(
+			GL_ELEMENT_ARRAY_BUFFER, 
+			this->m_EBO
+		);
+		glBufferData(
+			GL_ELEMENT_ARRAY_BUFFER, 
+			this->m_indices.size() * sizeof(unsigned int), 
+			&m_indices[0], 
+			GL_STATIC_DRAW
+		);
+	}
 
 	// vertices
 	glEnableVertexAttribArray(0);
