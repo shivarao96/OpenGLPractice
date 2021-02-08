@@ -31,7 +31,7 @@ private:
 		aiTextureType type,
 		std::string typeName
 	);
-	unsigned int textureFromFile(
+	TextureHandler* textureFromFile(
 		const char* fileName, 
 		bool flipVerticallyImage
 	);

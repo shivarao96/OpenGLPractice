@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "Shader.h"
+#include "TextureHandler.h"
 
 namespace Mesh {
 	struct VertexInfo
@@ -17,9 +18,11 @@ namespace Mesh {
 
 	struct TextureInfo
 	{
-		unsigned int id;
+	public:
+		TextureHandler* texture;
 		std::string type;
 		std::string path;
+
 	};
 	class MeshConfig
 	{

@@ -40,7 +40,7 @@ void Mesh::MeshConfig::drawMesh(Shader& shader) {
 			number = std::to_string(nrheight++);
 
 		shader.setInt((name + number).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
+		glBindTexture(GL_TEXTURE_2D, m_textures[i].texture->getTextureId());
 	}
 	glBindVertexArray(this->m_VAO);
 	glDrawElements(GL_TRIANGLES, this->m_indices.size(), GL_UNSIGNED_INT, 0);
