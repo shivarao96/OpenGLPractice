@@ -3,11 +3,11 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
-#include <sys/stat.h>
+#include "Utils.h"
 
 
 Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath) {	
-	if (checkShaderFile(vertexShaderPath) && checkShaderFile(fragmentShaderPath)) {
+	if (Utils::checkFile(vertexShaderPath) && Utils::checkFile(fragmentShaderPath)) {
 		std::string vertexCode;
 		std::string fragmentCode;
 		std::ifstream fVetexFile;
@@ -97,12 +97,4 @@ void Shader::setUpShaderProgram(unsigned int vertexShader, unsigned int fragment
 	}
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-}
-bool Shader::checkShaderFile(const char* file) { // @TODO::move such functions in utility class
-	struct stat buffer;
-	if (stat(file, &buffer) != 0) {
-		std::cout << "File doesn't exist, please provide proper file path::" << file << std::endl;
-		return false;
-	}
-	return true;
 }

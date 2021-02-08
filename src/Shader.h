@@ -16,7 +16,6 @@ private:
 	unsigned int shaderProgramId = NULL;
 	unsigned int setUpShader(SHADERTYPE type, const char* shaderCode, const std::string& fileName);
 	void setUpShaderProgram(unsigned int vertexShader, unsigned int fragmentShader);
-	bool checkShaderFile(const char* file); // @TODO::move such functions in utility class
 public:
 	Shader(const char* vertexShaderPath, const char* fragmentShaderPath);
 	~Shader();

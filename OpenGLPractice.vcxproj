@@ -78,13 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)Dependencies\assimp\include;$(SolutionDir)Dependencies\includes;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Dependencies\assimp\lib;$(SolutionDir)Dependencies\GLFW\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Dependencies\assimp_old\include;$(SolutionDir)Dependencies\includes;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Dependencies\assimp_old\lib;$(SolutionDir)Dependencies\GLFW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Dependencies\assimp\include;$(SolutionDir)Dependencies\includes;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Dependencies\assimp\lib;$(SolutionDir)Dependencies\GLFW\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Dependencies\assimp_old\include;$(SolutionDir)Dependencies\includes;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Dependencies\assimp_old\lib;$(SolutionDir)Dependencies\GLFW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -124,7 +124,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,10 +141,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="src\Shader.cpp" />
@@ -163,9 +165,12 @@
     <None Include="shaders\Shader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\TextureHandler.h" />
+    <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\grass.png" />
