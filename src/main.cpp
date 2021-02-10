@@ -161,6 +161,7 @@ void renderStuff() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
+	glEnable(GL_CULL_FACE);
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -181,7 +182,8 @@ void renderStuff() {
 		
 		glm::mat4 commonView = newCam.getViewMatrix();
 		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), screenWidth / screenHeight, 0.1f, 100.0f);
-
+;
+		glCullFace(GL_FRONT);
 		//..render plane
 		planeShader.use();
 		glm::mat4 planeModel = glm::mat4(1.0f);
@@ -190,7 +192,10 @@ void renderStuff() {
 		planeShader.setMat4("view", commonView);
 		planeShader.setMat4("projection", commonProjection);
 		planeMesh->drawMesh(planeShader);
+		glDisable(GL_CULL_FACE);
 
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 		cubeShader.use();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, -2));
@@ -204,6 +209,7 @@ void renderStuff() {
 		cubeShader.setMat4("model", model);
 		cubeMesh->drawMesh(cubeShader);
 
+		glDisable(GL_CULL_FACE);
 		//..render grass
 		grassShader.use();
 		grassShader.setMat4("view", commonView);
@@ -252,47 +258,47 @@ void mouseScrollBack(GLFWwindow* window, double xOffset, double yOffset) {
 }
 Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures) {
 	float cubePosition[] = {
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f
+	-0.5f, -0.5f, -0.5f,
+	 0.5f,  0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,        
+	 0.5f,  0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
+	-0.5f,  0.5f, -0.5f,
+	// Front face
+	-0.5f, -0.5f,  0.5f,
+	 0.5f, -0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f,  0.5f,
+	-0.5f, -0.5f,  0.5f,
+	// Left face
+	-0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f,  0.5f,
+	-0.5f,  0.5f,  0.5f,
+	// Right face
+	 0.5f,  0.5f,  0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f,  0.5f, -0.5f,         
+	 0.5f, -0.5f, -0.5f,
+	 0.5f,  0.5f,  0.5f,
+	 0.5f, -0.5f,  0.5f,     
+	// Bottom face
+	-0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f,  0.5f,
+	 0.5f, -0.5f,  0.5f,
+	-0.5f, -0.5f,  0.5f,
+	-0.5f, -0.5f, -0.5f,
+	// Top face
+	-0.5f,  0.5f, -0.5f,
+	 0.5f,  0.5f,  0.5f,
+	 0.5f,  0.5f, -0.5f,     
+	 0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f, -0.5f,
+	-0.5f,  0.5f,  0.5f   
 	};
 	float cubeNormals[] = {
 		
@@ -339,47 +345,48 @@ Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures) {
 		0.0f,  1.0f,  0.0f
 	};
 	float cubeTextures[] = {
-		0.0f,  0.0f,
-		1.0f,  0.0f,
-		1.0f,  1.0f,
-		1.0f,  1.0f,
-		0.0f,  1.0f,
-		0.0f,  0.0f,
-
-		0.0f,  0.0f,
-		1.0f,  0.0f,
-		1.0f,  1.0f,
-		1.0f,  1.0f,
-		0.0f,  1.0f,
-		0.0f,  0.0f,
-
-		1.0f,  0.0f,
-		1.0f,  1.0f,
-		0.0f,  1.0f,
-		0.0f,  1.0f,
-		0.0f,  0.0f,
-		1.0f,  0.0f,
-
-		1.0f,  0.0f,
-		1.0f,  1.0f,
-		0.0f,  1.0f,
-		0.0f,  1.0f,
-		0.0f,  0.0f,
-		1.0f,  0.0f,
-
-		0.0f,  1.0f,
-		1.0f,  1.0f,
-		1.0f,  0.0f,
-		1.0f,  0.0f,
-		0.0f,  0.0f,
-		0.0f,  1.0f,
-
-		0.0f,  1.0f,
-		1.0f,  1.0f,
-		1.0f,  0.0f,
-		1.0f,  0.0f,
-		0.0f,  0.0f,
-		0.0f,  1.0f
+		// Back face
+		0.0f, 0.0f, 
+		1.0f, 1.0f,
+		1.0f, 0.0f,       
+		1.0f, 1.0f,
+		0.0f, 0.0f,
+		0.0f, 1.0f,
+		// Front face
+		0.0f, 0.0f, 
+		1.0f, 0.0f, 
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		// Left face
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f, 
+		0.0f, 1.0f, 
+		0.0f, 0.0f, 
+		1.0f, 0.0f,
+		// Right face
+		1.0f, 0.0f,
+		0.0f, 1.0f, 
+		1.0f, 1.0f,       
+		0.0f, 1.0f, 
+		1.0f, 0.0f,
+		0.0f, 0.0f,  
+		// Bottom face
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 0.0f,
+		0.0f, 1.0f,
+		// Top face
+		0.0f, 1.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,     
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		0.0f, 0.0f
 	};
 	std::vector<Mesh::VertexInfo> vertices;
 	std::vector<unsigned int> indices;
