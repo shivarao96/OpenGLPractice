@@ -1,15 +1,17 @@
 #include "TextureHandler.h"
 #include <glad/glad.h>
 
-TextureHandler::TextureHandler(const char* fileName, bool flipVerticallyImage) {
+TextureHandler::TextureHandler(const char* fileName, bool flipVerticallyImage, bool clampToEdge) {
 	if (flipVerticallyImage) {
 		stbi_set_flip_vertically_on_load(true);
 	}
 	glGenTextures(1, &imageId);
 	glBindTexture(GL_TEXTURE_2D, imageId);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	GLenum param = clampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, param);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, param);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	int width, height, nrChannel;

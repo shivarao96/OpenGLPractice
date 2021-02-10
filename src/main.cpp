@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <iostream>
 #include <glfw3.h>
+#include <map>
 #include "Shader.h"
 #include "Camera.h"
 #include "TextureHandler.h"
@@ -34,6 +35,7 @@ void mouseCallback(GLFWwindow* window, double xPos, double yPos);
 void mouseScrollBack(GLFWwindow* window, double xOffset, double yOffset);
 Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures);
 Mesh::MeshConfig* drawPlane(std::vector<Mesh::TextureInfo> textures);
+Mesh::MeshConfig* drawGrass(std::vector<Mesh::TextureInfo> textures);
 
 int main() {
 	init_glfw();
@@ -136,22 +138,28 @@ void renderStuff() {
 	Mesh::MeshConfig* planeMesh = drawPlane(planeTextures);
 
 	//..grass cube mesh
+	Shader grassShader("./shaders/Blending.vert", "./shaders/Blending.frag");
 	std::vector<Mesh::TextureInfo> grassTextures;
 	Mesh::TextureInfo grassTexture1;
-	grassTexture1.texture = new TextureHandler("./assets/textures/grass.png", false);
+	grassTexture1.texture = new TextureHandler("./assets/textures/window.png", false, true);
 	grassTexture1.type = "texture_diffuse";
 	grassTextures.push_back(grassTexture1);
-	Mesh::MeshConfig* grassCubeMesh = drawCube(grassTextures);
-	Shader outlineShader("./shaders/Model.vert", "./shaders/Model.frag");
+	Mesh::MeshConfig* grassMesh = drawGrass(grassTextures);
 
+	std::vector<glm::vec3> vegetation
+	{
+		glm::vec3(-1.5f, 0.0f, -0.48f),
+		glm::vec3(1.5f, 0.0f, 0.51f),
+		glm::vec3(0.0f, 0.0f, 0.7f),
+		glm::vec3(-0.3f, 0.0f, -2.3f),
+		glm::vec3(0.5f, 0.0f, -0.6f)
+	};
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-
-	
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -160,6 +168,13 @@ void renderStuff() {
 		lastFrame = currentFrame;
 
 		processInputs();
+
+		std::map<float, glm::vec3> sort;
+		for (unsigned int i = 0; i < vegetation.size(); i++) {
+			float distance = glm::length(newCam.getPosition() - vegetation[i]);
+			sort[distance] = vegetation[i];
+		}
+
 		glClearColor(1.0f, 0.5f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -168,7 +183,6 @@ void renderStuff() {
 		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), screenWidth / screenHeight, 0.1f, 100.0f);
 
 		//..render plane
-		glStencilMask(0x00);
 		planeShader.use();
 		glm::mat4 planeModel = glm::mat4(1.0f);
 		planeModel = glm::translate(planeModel, glm::vec3(0, -0.001, 0));
@@ -176,14 +190,6 @@ void renderStuff() {
 		planeShader.setMat4("view", commonView);
 		planeShader.setMat4("projection", commonProjection);
 		planeMesh->drawMesh(planeShader);
-
-		//..render cube
-		//glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		//glStencilMask(0xFF);
-
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
-		glDisable(GL_DEPTH_TEST);
 
 		cubeShader.use();
 		glm::mat4 model = glm::mat4(1.0f);
@@ -198,33 +204,17 @@ void renderStuff() {
 		cubeShader.setMat4("model", model);
 		cubeMesh->drawMesh(cubeShader);
 
-		glStencilMask(0xFF);
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glEnable(GL_DEPTH_TEST);
-
-		//..render scaled cube
-		outlineShader.use();
-		//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		//glStencilMask(0x00);
-		//glDisable(GL_DEPTH_TEST);
-		//glm::mat4 model = glm::mat4(1.0f);
-		float scale = 0.5;
+		//..render grass
+		grassShader.use();
+		grassShader.setMat4("view", commonView);
+		grassShader.setMat4("projection", commonProjection);
+		for (std::map<float, glm::vec3>::reverse_iterator it = sort.rbegin(); it != sort.rend(); ++it) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, it->second);
+			grassShader.setMat4("model", model);
+			grassMesh->drawMesh(grassShader);
+		}
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0, 0, -2));
-		model = glm::scale(model, glm::vec3(scale, scale, scale));
-		outlineShader.setMat4("model", model);
-		outlineShader.setMat4("view", commonView);
-		outlineShader.setMat4("projection", commonProjection);
-		grassCubeMesh->drawMesh(outlineShader);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(2, 0, 2));
-		model = glm::scale(model, glm::vec3(scale, scale, scale));
-		outlineShader.setMat4("model", model);
-		grassCubeMesh->drawMesh(outlineShader);
-		//glStencilMask(0xFF);
-		//glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		//glEnable(GL_DEPTH_TEST);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -238,7 +228,7 @@ void renderStuff() {
 	for (unsigned int i = 0; i < planeTextures.size(); i++) {
 		delete planeTextures[i].texture;
 	}
-	delete grassCubeMesh;
+	delete grassMesh;
 	for (unsigned int i = 0; i < grassTextures.size(); i++) {
 		delete grassTextures[i].texture;
 	}
@@ -424,7 +414,6 @@ Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures) {
 		textures
 	);
 }
-
 Mesh::MeshConfig* drawPlane(std::vector<Mesh::TextureInfo> textures) {
 	std::vector<Mesh::VertexInfo> vertices;
 	std::vector<unsigned int> indices;
@@ -469,6 +458,43 @@ Mesh::MeshConfig* drawPlane(std::vector<Mesh::TextureInfo> textures) {
 	}
 
 	return new Mesh::MeshConfig(
+		vertices,
+		indices,
+		textures
+	);
+}
+Mesh::MeshConfig* drawGrass(std::vector<Mesh::TextureInfo> textures) {
+	std::vector<Mesh::VertexInfo> vertices;
+	std::vector<unsigned int> indices;
+	float grassVertices[] = {
+		0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+		0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
+		1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+
+		0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+		1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+		1.0f,  0.5f,  0.0f,  1.0f,  0.0f
+	};
+	for (unsigned int i = 0; i < 6; i++) {
+		Mesh::VertexInfo vTemp;
+		int tempIndex = i * 5;
+		vTemp.vertices = glm::vec3(
+			grassVertices[tempIndex],
+			grassVertices[tempIndex + 1],
+			grassVertices[tempIndex + 2]
+		);
+		vTemp.texCoords = glm::vec2(
+			grassVertices[tempIndex + 3],
+			grassVertices[tempIndex + 4]
+		);
+		vTemp.normal = glm::vec3(0.0f);
+		vTemp.tangent = glm::vec3(0.0f);
+		vTemp.bitTangent = glm::vec3(0.0f);;
+
+		vertices.push_back(vTemp);
+	}
+
+	return new Mesh::MeshConfig (
 		vertices,
 		indices,
 		textures
