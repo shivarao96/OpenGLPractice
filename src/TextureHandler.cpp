@@ -32,7 +32,6 @@ TextureHandler::TextureHandler(const char* fileName, bool flipVerticallyImage) {
 	stbi_image_free(imageData);
 }
 TextureHandler::~TextureHandler() {
-	std::cout << "Texture Destructor called" << std::endl;
 	glDeleteTextures(1, &imageId);
 }
 const unsigned int TextureHandler::getTextureId() const {
