@@ -127,6 +127,7 @@ void renderStuff() {
 
 	//..Plane mesh
 	Shader planeShader("./shaders/Model.vert", "./shaders/Model.frag");
+
 	std::vector<Mesh::TextureInfo> planeTextures;
 	Mesh::TextureInfo planeTexture1;
 	planeTexture1.texture = new TextureHandler("./assets/textures/metal.png", false);
@@ -134,7 +135,23 @@ void renderStuff() {
 	planeTextures.push_back(planeTexture1);
 	Mesh::MeshConfig* planeMesh = drawPlane(planeTextures);
 
+	//..grass cube mesh
+	std::vector<Mesh::TextureInfo> grassTextures;
+	Mesh::TextureInfo grassTexture1;
+	grassTexture1.texture = new TextureHandler("./assets/textures/grass.png", false);
+	grassTexture1.type = "texture_diffuse";
+	grassTextures.push_back(grassTexture1);
+	Mesh::MeshConfig* grassCubeMesh = drawCube(grassTextures);
+	Shader outlineShader("./shaders/Model.vert", "./shaders/Model.frag");
+
+
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -144,12 +161,30 @@ void renderStuff() {
 
 		processInputs();
 		glClearColor(1.0f, 0.5f, 0.0f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+		
 		glm::mat4 commonView = newCam.getViewMatrix();
 		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), screenWidth / screenHeight, 0.1f, 100.0f);
 
+		//..render plane
+		glStencilMask(0x00);
+		planeShader.use();
+		glm::mat4 planeModel = glm::mat4(1.0f);
+		planeModel = glm::translate(planeModel, glm::vec3(0, -0.001, 0));
+		planeShader.setMat4("model", planeModel);
+		planeShader.setMat4("view", commonView);
+		planeShader.setMat4("projection", commonProjection);
+		planeMesh->drawMesh(planeShader);
+
 		//..render cube
+		//glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		//glStencilMask(0xFF);
+
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		glDisable(GL_DEPTH_TEST);
+
 		cubeShader.use();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, -2));
@@ -158,17 +193,38 @@ void renderStuff() {
 		cubeShader.setMat4("projection", commonProjection);
 		cubeMesh->drawMesh(cubeShader);
 
+		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(2, 0, 2));
 		cubeShader.setMat4("model", model);
 		cubeMesh->drawMesh(cubeShader);
 
-		//..render plane
-		planeShader.use();
-		model = glm::translate(model, glm::vec3(0, 0, 0));
-		planeShader.setMat4("model", model);
-		planeShader.setMat4("view", commonView);
-		planeShader.setMat4("projection", commonProjection);
-		planeMesh->drawMesh(planeShader);
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glEnable(GL_DEPTH_TEST);
+
+		//..render scaled cube
+		outlineShader.use();
+		//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		//glStencilMask(0x00);
+		//glDisable(GL_DEPTH_TEST);
+		//glm::mat4 model = glm::mat4(1.0f);
+		float scale = 0.5;
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0, 0, -2));
+		model = glm::scale(model, glm::vec3(scale, scale, scale));
+		outlineShader.setMat4("model", model);
+		outlineShader.setMat4("view", commonView);
+		outlineShader.setMat4("projection", commonProjection);
+		grassCubeMesh->drawMesh(outlineShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2, 0, 2));
+		model = glm::scale(model, glm::vec3(scale, scale, scale));
+		outlineShader.setMat4("model", model);
+		grassCubeMesh->drawMesh(outlineShader);
+		//glStencilMask(0xFF);
+		//glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		//glEnable(GL_DEPTH_TEST);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -181,6 +237,10 @@ void renderStuff() {
 	delete planeMesh;
 	for (unsigned int i = 0; i < planeTextures.size(); i++) {
 		delete planeTextures[i].texture;
+	}
+	delete grassCubeMesh;
+	for (unsigned int i = 0; i < grassTextures.size(); i++) {
+		delete grassTextures[i].texture;
 	}
 }
 void mouseCallback(GLFWwindow* window, double xPos, double yPos) {

@@ -15,6 +15,7 @@ Mesh::MeshConfig::MeshConfig(
 	this->setupMesh();
 }
 Mesh::MeshConfig::~MeshConfig() {
+	std::cout << "Mesh Destructor called" << std::endl;
 	glDeleteVertexArrays(1, &this->m_VAO);
 	glDeleteBuffers(1, &this->m_VBO);
 	glDeleteBuffers(1, &this->m_EBO);
