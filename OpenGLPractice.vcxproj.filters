@@ -54,6 +54,8 @@
     <None Include="shaders\Model.frag" />
     <None Include="shaders\Outline.vert" />
     <None Include="shaders\Outline.frag" />
+    <None Include="shaders\Blending.vert" />
+    <None Include="shaders\Blending.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">

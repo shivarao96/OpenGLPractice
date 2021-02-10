@@ -156,6 +156,8 @@
     <ClCompile Include="src\TextureHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\Blending.frag" />
+    <None Include="shaders\Blending.vert" />
     <None Include="shaders\container.frag" />
     <None Include="shaders\container.vert" />
     <None Include="shaders\Fragment.frag" />

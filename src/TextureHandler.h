@@ -8,7 +8,7 @@ class TextureHandler
 private:
 	unsigned int imageId;
 public:
-	TextureHandler(const char* fileName, bool flipVerticallyImage);
+	TextureHandler(const char* fileName, bool flipVerticallyImage, bool clampToEdge = false);
 	~TextureHandler();
 	const unsigned int getTextureId() const;
 };
