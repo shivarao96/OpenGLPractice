@@ -56,6 +56,8 @@
     <None Include="shaders\Outline.frag" />
     <None Include="shaders\Blending.vert" />
     <None Include="shaders\Blending.frag" />
+    <None Include="shaders\FrameBuffer.vert" />
+    <None Include="shaders\FrameBuffer.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
