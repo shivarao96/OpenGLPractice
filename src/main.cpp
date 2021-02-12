@@ -122,46 +122,97 @@ void renderStuff() {
 	Shader cubeShader("./shaders/Model.vert", "./shaders/Model.frag");
 	std::vector<Mesh::TextureInfo> cubeTextures;
 	Mesh::TextureInfo cubeTexture1;
-	cubeTexture1.texture = new TextureHandler("./assets/textures/marble.jpg", false);
+	cubeTexture1.texture = new TextureHandler("./assets/textures/grass-cube.png", false);
 	cubeTexture1.type = "texture_diffuse";
 	cubeTextures.push_back(cubeTexture1);
 	Mesh::MeshConfig* cubeMesh = drawCube(cubeTextures);
 
-	//..Plane mesh
-	Shader planeShader("./shaders/Model.vert", "./shaders/Model.frag");
+	float quadVertices[] = {
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
 
-	std::vector<Mesh::TextureInfo> planeTextures;
-	Mesh::TextureInfo planeTexture1;
-	planeTexture1.texture = new TextureHandler("./assets/textures/metal.png", false);
-	planeTexture1.type = "texture_diffuse";
-	planeTextures.push_back(planeTexture1);
-	Mesh::MeshConfig* planeMesh = drawPlane(planeTextures);
-
-	//..grass cube mesh
-	Shader grassShader("./shaders/Blending.vert", "./shaders/Blending.frag");
-	std::vector<Mesh::TextureInfo> grassTextures;
-	Mesh::TextureInfo grassTexture1;
-	grassTexture1.texture = new TextureHandler("./assets/textures/window.png", false, true);
-	grassTexture1.type = "texture_diffuse";
-	grassTextures.push_back(grassTexture1);
-	Mesh::MeshConfig* grassMesh = drawGrass(grassTextures);
-
-	std::vector<glm::vec3> vegetation
-	{
-		glm::vec3(-1.5f, 0.0f, -0.48f),
-		glm::vec3(1.5f, 0.0f, 0.51f),
-		glm::vec3(0.0f, 0.0f, 0.7f),
-		glm::vec3(-0.3f, 0.0f, -2.3f),
-		glm::vec3(0.5f, 0.0f, -0.6f)
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f,  1.0f, 1.0f
 	};
+
+	unsigned int quadVAO, quadVBO;
+	glGenVertexArrays(1, &quadVAO);
+	glGenBuffers(1, &quadVBO);
+
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	Shader frameBufferShader("./shaders/FrameBuffer.vert", "./shaders/FrameBuffer.frag");
+
+	frameBufferShader.use();
+	frameBufferShader.setInt("screenTexture", 0);
+
+	//..main frame buffer
+	unsigned int frameBuffer;
+	glGenFramebuffers(1, &frameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+	//..texture for frame buffer
+	unsigned int frameBufferTexture;
+	glGenTextures(1, &frameBufferTexture);
+	glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_RGB,
+		screenWidth,
+		screenHeight,
+		0,
+		GL_RGB,
+		GL_UNSIGNED_BYTE,
+		NULL
+	);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(
+		GL_FRAMEBUFFER,
+		GL_COLOR_ATTACHMENT0,
+		GL_TEXTURE_2D,
+		frameBufferTexture,
+		0
+	);
+
+	//..render buffer object for frame buffer
+	unsigned int frameBufferRBO;
+	glGenRenderbuffers(1, &frameBufferRBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, frameBufferRBO);
+	glRenderbufferStorage(
+		GL_RENDERBUFFER, 
+		GL_DEPTH24_STENCIL8, 
+		screenWidth,
+		screenHeight
+	);
+	glFramebufferRenderbuffer(
+		GL_FRAMEBUFFER,
+		GL_DEPTH_STENCIL_ATTACHMENT,
+		GL_RENDERBUFFER,
+		frameBufferRBO
+	);
+
+	//..check frame buffer status
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		std::cout << "Failed to setup frame buffer !" << std::endl;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
 	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -170,73 +221,48 @@ void renderStuff() {
 
 		processInputs();
 
-		std::map<float, glm::vec3> sort;
-		for (unsigned int i = 0; i < vegetation.size(); i++) {
-			float distance = glm::length(newCam.getPosition() - vegetation[i]);
-			sort[distance] = vegetation[i];
-		}
+		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+		glEnable(GL_DEPTH_TEST);
 
-		glClearColor(1.0f, 0.5f, 0.0f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		//glClearColor(1.0f, 0.5f, 0.0f, 0.0f); orange
+		//glClearColor(0.0f, 0.74f, 1.0f, 0.0f); sky blue
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		
 		glm::mat4 commonView = newCam.getViewMatrix();
 		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), screenWidth / screenHeight, 0.1f, 100.0f);
 ;
-		glCullFace(GL_FRONT);
-		//..render plane
-		planeShader.use();
-		glm::mat4 planeModel = glm::mat4(1.0f);
-		planeModel = glm::translate(planeModel, glm::vec3(0, -0.001, 0));
-		planeShader.setMat4("model", planeModel);
-		planeShader.setMat4("view", commonView);
-		planeShader.setMat4("projection", commonProjection);
-		planeMesh->drawMesh(planeShader);
-		glDisable(GL_CULL_FACE);
-
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
 		cubeShader.use();
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0, 0, -2));
-		cubeShader.setMat4("model", model);
 		cubeShader.setMat4("view", commonView);
 		cubeShader.setMat4("projection", commonProjection);
-		cubeMesh->drawMesh(cubeShader);
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(2, 0, 2));
+		model = glm::translate(model, glm::vec3(0, 0, 0));
 		cubeShader.setMat4("model", model);
 		cubeMesh->drawMesh(cubeShader);
 
-		glDisable(GL_CULL_FACE);
-		//..render grass
-		grassShader.use();
-		grassShader.setMat4("view", commonView);
-		grassShader.setMat4("projection", commonProjection);
-		for (std::map<float, glm::vec3>::reverse_iterator it = sort.rbegin(); it != sort.rend(); ++it) {
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, it->second);
-			grassShader.setMat4("model", model);
-			grassMesh->drawMesh(grassShader);
-		}
-		model = glm::mat4(1.0f);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDisable(GL_DEPTH_TEST);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		frameBufferShader.use();
+		glBindVertexArray(quadVAO);
+		glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
+	glDeleteBuffers(1, &quadVAO);
+
 	delete cubeMesh;
 	for (unsigned int i = 0; i < cubeTextures.size(); i++) {
 		delete cubeTextures[i].texture;
-	}
-	delete planeMesh;
-	for (unsigned int i = 0; i < planeTextures.size(); i++) {
-		delete planeTextures[i].texture;
-	}
-	delete grassMesh;
-	for (unsigned int i = 0; i < grassTextures.size(); i++) {
-		delete grassTextures[i].texture;
 	}
 }
 void mouseCallback(GLFWwindow* window, double xPos, double yPos) {

@@ -161,6 +161,8 @@
     <None Include="shaders\container.frag" />
     <None Include="shaders\container.vert" />
     <None Include="shaders\Fragment.frag" />
+    <None Include="shaders\FrameBuffer.frag" />
+    <None Include="shaders\FrameBuffer.vert" />
     <None Include="shaders\light.frag" />
     <None Include="shaders\light.vert" />
     <None Include="shaders\Model.frag" />
