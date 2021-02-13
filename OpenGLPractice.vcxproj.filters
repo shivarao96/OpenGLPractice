@@ -58,6 +58,8 @@
     <None Include="shaders\Blending.frag" />
     <None Include="shaders\FrameBuffer.vert" />
     <None Include="shaders\FrameBuffer.frag" />
+    <None Include="shaders\SkyBox.vert" />
+    <None Include="shaders\SkyBox.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">

@@ -180,8 +180,8 @@ std::vector<Mesh::TextureInfo> Model::loadMaterialTextures(
 	return textures;
 }
 
-TextureHandler* Model::textureFromFile(const char* fileN, bool flipVerticallyImage) {
+Texture::TextureHandler* Model::textureFromFile(const char* fileN, bool flipVerticallyImage) {
 	std::string filename = std::string(fileN);
 	filename = m_directory + '/' + filename;
-	return new TextureHandler(filename.c_str(), false);
+	return new Texture::TextureHandler(filename.c_str(), false);
 }
