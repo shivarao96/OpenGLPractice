@@ -40,6 +40,9 @@ Shader::~Shader() {
 void Shader::use() {
 	glUseProgram(shaderProgramId);
 }
+const unsigned int Shader::getShaderId() const {
+	return shaderProgramId;
+}
 void Shader::setBool(const std::string& name, bool val) const {
 	glUniform1i(glGetUniformLocation(shaderProgramId, name.c_str()), (int)val);
 }
@@ -67,7 +70,6 @@ void Shader::setVec3(const std::string& name, const glm::vec3& val) {
 void Shader::setVec4(const std::string& name, const glm::vec4& val) {
 	glUniform4fv(glGetUniformLocation(shaderProgramId, name.c_str()), 1, &val[0]);
 }
-
 unsigned int Shader::setUpShader(SHADERTYPE type, const char* shaderCode, const std::string& fileName) {
 	GLenum shaderType = (type == SHADERTYPE::VERTEX) ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
 	unsigned int shaderId = glCreateShader(shaderType);

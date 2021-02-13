@@ -156,22 +156,27 @@
     <ClCompile Include="src\TextureHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\advanced_glsl.vert" />
     <None Include="shaders\Blending.frag" />
     <None Include="shaders\Blending.vert" />
+    <None Include="shaders\blue_advance_glsl.frag" />
     <None Include="shaders\container.frag" />
     <None Include="shaders\container.vert" />
     <None Include="shaders\Fragment.frag" />
     <None Include="shaders\FrameBuffer.frag" />
     <None Include="shaders\FrameBuffer.vert" />
+    <None Include="shaders\green_advance_glsl.frag" />
     <None Include="shaders\light.frag" />
     <None Include="shaders\light.vert" />
     <None Include="shaders\Model.frag" />
     <None Include="shaders\Model.vert" />
     <None Include="shaders\Outline.frag" />
     <None Include="shaders\Outline.vert" />
+    <None Include="shaders\red_advance_glsl.frag" />
     <None Include="shaders\Shader.vert" />
     <None Include="shaders\SkyBox.frag" />
     <None Include="shaders\SkyBox.vert" />
+    <None Include="shaders\yellow_advance_glsl.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
