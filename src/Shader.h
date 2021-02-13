@@ -21,6 +21,7 @@ public:
 	~Shader();
 
 	void use();
+	const unsigned int getShaderId() const;
 	void setBool(const std::string& name, bool val) const;
 	void setInt(const std::string& name, int val) const;
 	void setFloat(const std::string& name, float value) const;

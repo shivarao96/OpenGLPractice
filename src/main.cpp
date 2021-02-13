@@ -118,77 +118,122 @@ void processInputs() {
 }
 void renderStuff() {
 	//..cube mesh
-	Shader cubeShader("./shaders/Model.vert", "./shaders/Model.frag");
+	/*Shader cubeShader("./shaders/Model.vert", "./shaders/Model.frag");
 	std::vector<Mesh::TextureInfo> cubeTextures;
 	Mesh::TextureInfo cubeTexture1;
 	cubeTexture1.texture = new Texture::TextureHandler("./assets/textures/grass-cube.png", false);
 	cubeTexture1.type = "texture_diffuse";
 	cubeTextures.push_back(cubeTexture1);
-	Mesh::MeshConfig* cubeMesh = drawCube(cubeTextures);
+	Mesh::MeshConfig* cubeMesh = drawCube(cubeTextures);*/
 
-	float skyBoxVertice[] = {
-		-20.0f,  20.0f, -20.0f,
-		-20.0f, -20.0f, -20.0f,
-		 20.0f, -20.0f, -20.0f,
-		 20.0f, -20.0f, -20.0f,
-		 20.0f,  20.0f, -20.0f,
-		-20.0f,  20.0f, -20.0f,
+	Shader shaderRed("./shaders/advanced_glsl.vert", "./shaders/red_advance_glsl.frag");
+	Shader shaderBlue("./shaders/advanced_glsl.vert", "./shaders/blue_advance_glsl.frag");
+	Shader shaderGreen("./shaders/advanced_glsl.vert", "./shaders/green_advance_glsl.frag");
+	Shader shaderYellow("./shaders/advanced_glsl.vert", "./shaders/yellow_advance_glsl.frag");
 
-		-20.0f, -20.0f,  20.0f,
-		-20.0f, -20.0f, -20.0f,
-		-20.0f,  20.0f, -20.0f,
-		-20.0f,  20.0f, -20.0f,
-		-20.0f,  20.0f,  20.0f,
-		-20.0f, -20.0f,  20.0f,
+	float cubeVertices[] = {
+		// positions         
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
 
-		20.0f, -20.0f, -20.0f,
-		20.0f, -20.0f,  20.0f,
-		20.0f,  20.0f,  20.0f,
-		20.0f,  20.0f,  20.0f,
-		20.0f,  20.0f, -20.0f,
-		20.0f, -20.0f, -20.0f,
+		-0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
 
-		-20.0f, -20.0f, 20.0f,
-		-20.0f,  20.0f, 20.0f,
-		 20.0f,  20.0f, 20.0f,
-		 20.0f,  20.0f, 20.0f,
-		 20.0f, -20.0f, 20.0f,
-		-20.0f, -20.0f, 20.0f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
 
-		-20.0f, 20.0f, -20.0f,
-		 20.0f, 20.0f, -20.0f,
-		 20.0f, 20.0f,  20.0f,
-		 20.0f, 20.0f,  20.0f,
-		-20.0f, 20.0f,  20.0f,
-		-20.0f, 20.0f, -20.0f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
 
-		-20.0f, -20.0f, -20.0f,
-		-20.0f, -20.0f,  20.0f,
-		 20.0f, -20.0f, -20.0f,
-		 20.0f, -20.0f, -20.0f,
-		-20.0f, -20.0f,  20.0f,
-		 20.0f, -20.0f,  20.0f
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f,
+
+		-0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
 	};
-
-	unsigned int skyBoxVAO, skyBoxVBO;
-	glGenVertexArrays(1, &skyBoxVAO);
-	glGenBuffers(1, &skyBoxVBO);
-	glBindVertexArray(skyBoxVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, skyBoxVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skyBoxVertice), skyBoxVertice, GL_STATIC_DRAW);
+	unsigned int cubeVAO, cubeVBO;
+	glGenVertexArrays(1, &cubeVAO);
+	glGenBuffers(1, &cubeVBO);
+	glBindVertexArray(cubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-	Shader skyBoxShader("./shaders/SkyBox.vert", "./shaders/SkyBox.frag");
-	skyBoxShader.use();
-	skyBoxShader.setInt("skyBoxTex", 0);
-	Texture::CubeTextureHandler skyBoxTexture("./assets/textures/skybox/");
+	unsigned int uniformBlockIndexRed = glGetUniformBlockIndex(shaderRed.getShaderId(), "Matrices");
+	unsigned int uniformBlockIndexBlue = glGetUniformBlockIndex(shaderBlue.getShaderId(), "Matrices");
+	unsigned int uniformBlockIndexGreen = glGetUniformBlockIndex(shaderGreen.getShaderId(), "Matrices");
+	unsigned int uniformBlockIndexYellow = glGetUniformBlockIndex(shaderYellow.getShaderId(), "Matrices");
+
+	glUniformBlockBinding(shaderRed.getShaderId(), uniformBlockIndexRed, 0);
+	glUniformBlockBinding(shaderBlue.getShaderId(), uniformBlockIndexBlue, 0);
+	glUniformBlockBinding(shaderGreen.getShaderId(), uniformBlockIndexGreen, 0);
+	glUniformBlockBinding(shaderYellow.getShaderId(), uniformBlockIndexYellow, 0);
+
+	unsigned int uboMatrices;
+	glGenBuffers(1, &uboMatrices);
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+	glBufferData(
+		GL_UNIFORM_BUFFER, 
+		2 * sizeof(glm::mat4), 
+		NULL, 
+		GL_STATIC_DRAW
+	);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBufferRange(
+		GL_UNIFORM_BUFFER,
+		0,
+		uboMatrices,
+		0,
+		2 * sizeof(glm::mat4)
+	);
+
+	glm::mat4 commonProjection = glm::perspective(
+		glm::radians(newCam.getZoomVal()),
+		screenWidth / screenHeight,
+		0.1f,
+		100.0f
+	);
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+	glBufferSubData(
+		GL_UNIFORM_BUFFER,
+		0,
+		sizeof(glm::mat4),
+		glm::value_ptr(commonProjection)
+	);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -199,48 +244,63 @@ void renderStuff() {
 		processInputs();
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		//glClearColor(1.0f, 0.5f, 0.0f, 0.0f); orange
-		//glClearColor(0.0f, 0.74f, 1.0f, 0.0f); sky blue
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 commonView = newCam.getViewMatrix();
-		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), screenWidth / screenHeight, 0.1f, 100.0f);
-		
-		cubeShader.use();
+		glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+		glBufferSubData(
+			GL_UNIFORM_BUFFER,
+			sizeof(glm::mat4),
+			sizeof(glm::mat4),
+			glm::value_ptr(commonView)
+		);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+				
+
+		/*cubeShader.use();
 		glm::mat4 model = glm::mat4(1.0f);
 		cubeShader.setMat4("view", commonView);
 		cubeShader.setMat4("projection", commonProjection);
 
 		model = glm::mat4(1.0f);
-		//model = glm::translate(model, glm::vec3(0, 0, 0));
+		model = glm::translate(model, glm::vec3(0, 0, 0));
 		cubeShader.setMat4("model", model);
-		cubeMesh->drawMesh(cubeShader);
+		cubeMesh->drawMesh(cubeShader);*/
 
-		//..skybox
-		glDepthFunc(GL_LEQUAL);
-		skyBoxShader.use();
-		glm::mat4 skyboxView = glm::mat4(glm::mat3(newCam.getViewMatrix()));
-		skyBoxShader.setMat4("view", skyboxView);
-		skyBoxShader.setMat4("projection", commonProjection);
-
-		glBindVertexArray(skyBoxVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxTexture.getCubeTextureId());
+		glBindVertexArray(cubeVAO);
+		shaderRed.use();
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f)); // move top-left
+		shaderRed.setMat4("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-		glDepthFunc(GL_LESS);
+		// GREEN
+		shaderGreen.use();
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.75f, 0.75f, 0.0f)); // move top-right
+		shaderGreen.setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		// YELLOW
+		shaderYellow.use();
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-0.75f, -0.75f, 0.0f)); // move bottom-left
+		shaderYellow.setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		// BLUE
+		shaderBlue.use();
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.75f, -0.75f, 0.0f)); // move bottom-right
+		shaderBlue.setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	delete cubeMesh;
+	/*delete cubeMesh;
 	for (unsigned int i = 0; i < cubeTextures.size(); i++) {
 		delete cubeTextures[i].texture;
-	}
-
-	glDeleteVertexArrays(1, &skyBoxVAO);
-	glDeleteBuffers(1, &skyBoxVBO);
+	}*/
 }
 void mouseCallback(GLFWwindow* window, double xPos, double yPos) {
 	if (isFirstMouseEvent) {

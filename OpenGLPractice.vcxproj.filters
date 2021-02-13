@@ -60,6 +60,11 @@
     <None Include="shaders\FrameBuffer.frag" />
     <None Include="shaders\SkyBox.vert" />
     <None Include="shaders\SkyBox.frag" />
+    <None Include="shaders\advanced_glsl.vert" />
+    <None Include="shaders\red_advance_glsl.frag" />
+    <None Include="shaders\green_advance_glsl.frag" />
+    <None Include="shaders\blue_advance_glsl.frag" />
+    <None Include="shaders\yellow_advance_glsl.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
