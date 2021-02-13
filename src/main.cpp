@@ -117,95 +117,72 @@ void processInputs() {
 	}
 }
 void renderStuff() {
-
 	//..cube mesh
 	Shader cubeShader("./shaders/Model.vert", "./shaders/Model.frag");
 	std::vector<Mesh::TextureInfo> cubeTextures;
 	Mesh::TextureInfo cubeTexture1;
-	cubeTexture1.texture = new TextureHandler("./assets/textures/grass-cube.png", false);
+	cubeTexture1.texture = new Texture::TextureHandler("./assets/textures/grass-cube.png", false);
 	cubeTexture1.type = "texture_diffuse";
 	cubeTextures.push_back(cubeTexture1);
 	Mesh::MeshConfig* cubeMesh = drawCube(cubeTextures);
 
-	float quadVertices[] = {
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		-1.0f, -1.0f,  0.0f, 0.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
+	float skyBoxVertice[] = {
+		-20.0f,  20.0f, -20.0f,
+		-20.0f, -20.0f, -20.0f,
+		 20.0f, -20.0f, -20.0f,
+		 20.0f, -20.0f, -20.0f,
+		 20.0f,  20.0f, -20.0f,
+		-20.0f,  20.0f, -20.0f,
 
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-		 1.0f,  1.0f,  1.0f, 1.0f
+		-20.0f, -20.0f,  20.0f,
+		-20.0f, -20.0f, -20.0f,
+		-20.0f,  20.0f, -20.0f,
+		-20.0f,  20.0f, -20.0f,
+		-20.0f,  20.0f,  20.0f,
+		-20.0f, -20.0f,  20.0f,
+
+		20.0f, -20.0f, -20.0f,
+		20.0f, -20.0f,  20.0f,
+		20.0f,  20.0f,  20.0f,
+		20.0f,  20.0f,  20.0f,
+		20.0f,  20.0f, -20.0f,
+		20.0f, -20.0f, -20.0f,
+
+		-20.0f, -20.0f, 20.0f,
+		-20.0f,  20.0f, 20.0f,
+		 20.0f,  20.0f, 20.0f,
+		 20.0f,  20.0f, 20.0f,
+		 20.0f, -20.0f, 20.0f,
+		-20.0f, -20.0f, 20.0f,
+
+		-20.0f, 20.0f, -20.0f,
+		 20.0f, 20.0f, -20.0f,
+		 20.0f, 20.0f,  20.0f,
+		 20.0f, 20.0f,  20.0f,
+		-20.0f, 20.0f,  20.0f,
+		-20.0f, 20.0f, -20.0f,
+
+		-20.0f, -20.0f, -20.0f,
+		-20.0f, -20.0f,  20.0f,
+		 20.0f, -20.0f, -20.0f,
+		 20.0f, -20.0f, -20.0f,
+		-20.0f, -20.0f,  20.0f,
+		 20.0f, -20.0f,  20.0f
 	};
 
-	unsigned int quadVAO, quadVBO;
-	glGenVertexArrays(1, &quadVAO);
-	glGenBuffers(1, &quadVBO);
-
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	unsigned int skyBoxVAO, skyBoxVBO;
+	glGenVertexArrays(1, &skyBoxVAO);
+	glGenBuffers(1, &skyBoxVBO);
+	glBindVertexArray(skyBoxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyBoxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyBoxVertice), skyBoxVertice, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-	Shader frameBufferShader("./shaders/FrameBuffer.vert", "./shaders/FrameBuffer.frag");
-
-	frameBufferShader.use();
-	frameBufferShader.setInt("screenTexture", 0);
-
-	//..main frame buffer
-	unsigned int frameBuffer;
-	glGenFramebuffers(1, &frameBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-
-	//..texture for frame buffer
-	unsigned int frameBufferTexture;
-	glGenTextures(1, &frameBufferTexture);
-	glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
-	glTexImage2D(
-		GL_TEXTURE_2D,
-		0,
-		GL_RGB,
-		screenWidth,
-		screenHeight,
-		0,
-		GL_RGB,
-		GL_UNSIGNED_BYTE,
-		NULL
-	);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(
-		GL_FRAMEBUFFER,
-		GL_COLOR_ATTACHMENT0,
-		GL_TEXTURE_2D,
-		frameBufferTexture,
-		0
-	);
-
-	//..render buffer object for frame buffer
-	unsigned int frameBufferRBO;
-	glGenRenderbuffers(1, &frameBufferRBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, frameBufferRBO);
-	glRenderbufferStorage(
-		GL_RENDERBUFFER, 
-		GL_DEPTH24_STENCIL8, 
-		screenWidth,
-		screenHeight
-	);
-	glFramebufferRenderbuffer(
-		GL_FRAMEBUFFER,
-		GL_DEPTH_STENCIL_ATTACHMENT,
-		GL_RENDERBUFFER,
-		frameBufferRBO
-	);
-
-	//..check frame buffer status
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "Failed to setup frame buffer !" << std::endl;
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	Shader skyBoxShader("./shaders/SkyBox.vert", "./shaders/SkyBox.frag");
+	skyBoxShader.use();
+	skyBoxShader.setInt("skyBoxTex", 0);
+	Texture::CubeTextureHandler skyBoxTexture("./assets/textures/skybox/");
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -221,49 +198,49 @@ void renderStuff() {
 
 		processInputs();
 
-		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-		glEnable(GL_DEPTH_TEST);
-
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		//glClearColor(1.0f, 0.5f, 0.0f, 0.0f); orange
 		//glClearColor(0.0f, 0.74f, 1.0f, 0.0f); sky blue
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		
 		glm::mat4 commonView = newCam.getViewMatrix();
 		glm::mat4 commonProjection = glm::perspective(glm::radians(newCam.getZoomVal()), screenWidth / screenHeight, 0.1f, 100.0f);
-;
+		
 		cubeShader.use();
 		glm::mat4 model = glm::mat4(1.0f);
 		cubeShader.setMat4("view", commonView);
 		cubeShader.setMat4("projection", commonProjection);
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0, 0, 0));
+		//model = glm::translate(model, glm::vec3(0, 0, 0));
 		cubeShader.setMat4("model", model);
 		cubeMesh->drawMesh(cubeShader);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDisable(GL_DEPTH_TEST);
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		//..skybox
+		glDepthFunc(GL_LEQUAL);
+		skyBoxShader.use();
+		glm::mat4 skyboxView = glm::mat4(glm::mat3(newCam.getViewMatrix()));
+		skyBoxShader.setMat4("view", skyboxView);
+		skyBoxShader.setMat4("projection", commonProjection);
 
-		frameBufferShader.use();
-		glBindVertexArray(quadVAO);
-		glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
+		glBindVertexArray(skyBoxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxTexture.getCubeTextureId());
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	glDeleteBuffers(1, &quadVAO);
-
 	delete cubeMesh;
 	for (unsigned int i = 0; i < cubeTextures.size(); i++) {
 		delete cubeTextures[i].texture;
 	}
+
+	glDeleteVertexArrays(1, &skyBoxVAO);
+	glDeleteBuffers(1, &skyBoxVBO);
 }
 void mouseCallback(GLFWwindow* window, double xPos, double yPos) {
 	if (isFirstMouseEvent) {
@@ -286,7 +263,7 @@ Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures) {
 	float cubePosition[] = {
 	-0.5f, -0.5f, -0.5f,
 	 0.5f,  0.5f, -0.5f,
-	 0.5f, -0.5f, -0.5f,        
+	 0.5f, -0.5f, -0.5f,
 	 0.5f,  0.5f, -0.5f,
 	-0.5f, -0.5f, -0.5f,
 	-0.5f,  0.5f, -0.5f,
@@ -307,27 +284,26 @@ Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures) {
 	// Right face
 	 0.5f,  0.5f,  0.5f,
 	 0.5f, -0.5f, -0.5f,
-	 0.5f,  0.5f, -0.5f,         
+	 0.5f,  0.5f, -0.5f,
 	 0.5f, -0.5f, -0.5f,
 	 0.5f,  0.5f,  0.5f,
-	 0.5f, -0.5f,  0.5f,     
-	// Bottom face
-	-0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f, -0.5f,
 	 0.5f, -0.5f,  0.5f,
-	 0.5f, -0.5f,  0.5f,
-	-0.5f, -0.5f,  0.5f,
-	-0.5f, -0.5f, -0.5f,
-	// Top face
-	-0.5f,  0.5f, -0.5f,
-	 0.5f,  0.5f,  0.5f,
-	 0.5f,  0.5f, -0.5f,     
-	 0.5f,  0.5f,  0.5f,
-	-0.5f,  0.5f, -0.5f,
-	-0.5f,  0.5f,  0.5f   
+	 // Bottom face
+	 -0.5f, -0.5f, -0.5f,
+	  0.5f, -0.5f, -0.5f,
+	  0.5f, -0.5f,  0.5f,
+	  0.5f, -0.5f,  0.5f,
+	 -0.5f, -0.5f,  0.5f,
+	 -0.5f, -0.5f, -0.5f,
+	 // Top face
+	 -0.5f,  0.5f, -0.5f,
+	  0.5f,  0.5f,  0.5f,
+	  0.5f,  0.5f, -0.5f,
+	  0.5f,  0.5f,  0.5f,
+	 -0.5f,  0.5f, -0.5f,
+	 -0.5f,  0.5f,  0.5f
 	};
 	float cubeNormals[] = {
-		
 		0.0f,  0.0f, -1.0f,
 		0.0f,  0.0f, -1.0f,
 		0.0f,  0.0f, -1.0f,
@@ -372,15 +348,15 @@ Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures) {
 	};
 	float cubeTextures[] = {
 		// Back face
-		0.0f, 0.0f, 
+		0.0f, 0.0f,
 		1.0f, 1.0f,
-		1.0f, 0.0f,       
+		1.0f, 0.0f,
 		1.0f, 1.0f,
 		0.0f, 0.0f,
 		0.0f, 1.0f,
 		// Front face
-		0.0f, 0.0f, 
-		1.0f, 0.0f, 
+		0.0f, 0.0f,
+		1.0f, 0.0f,
 		1.0f, 1.0f,
 		1.0f, 1.0f,
 		0.0f, 1.0f,
@@ -388,17 +364,17 @@ Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures) {
 		// Left face
 		1.0f, 0.0f,
 		1.0f, 1.0f,
-		0.0f, 1.0f, 
-		0.0f, 1.0f, 
-		0.0f, 0.0f, 
+		0.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 0.0f,
 		1.0f, 0.0f,
 		// Right face
 		1.0f, 0.0f,
-		0.0f, 1.0f, 
-		1.0f, 1.0f,       
-		0.0f, 1.0f, 
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
 		1.0f, 0.0f,
-		0.0f, 0.0f,  
+		0.0f, 0.0f,
 		// Bottom face
 		0.0f, 1.0f,
 		1.0f, 1.0f,
@@ -409,7 +385,7 @@ Mesh::MeshConfig* drawCube(std::vector<Mesh::TextureInfo> textures) {
 		// Top face
 		0.0f, 1.0f,
 		1.0f, 0.0f,
-		1.0f, 1.0f,     
+		1.0f, 1.0f,
 		1.0f, 0.0f,
 		0.0f, 1.0f,
 		0.0f, 0.0f
@@ -527,7 +503,7 @@ Mesh::MeshConfig* drawGrass(std::vector<Mesh::TextureInfo> textures) {
 		vertices.push_back(vTemp);
 	}
 
-	return new Mesh::MeshConfig (
+	return new Mesh::MeshConfig(
 		vertices,
 		indices,
 		textures

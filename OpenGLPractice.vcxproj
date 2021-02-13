@@ -170,6 +170,8 @@
     <None Include="shaders\Outline.frag" />
     <None Include="shaders\Outline.vert" />
     <None Include="shaders\Shader.vert" />
+    <None Include="shaders\SkyBox.frag" />
+    <None Include="shaders\SkyBox.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />

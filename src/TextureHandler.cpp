@@ -1,7 +1,8 @@
 #include "TextureHandler.h"
 #include <glad/glad.h>
 
-TextureHandler::TextureHandler(const char* fileName, bool flipVerticallyImage, bool clampToEdge) {
+//..Texture handler code start
+Texture::TextureHandler::TextureHandler(const char* fileName, bool flipVerticallyImage, bool clampToEdge) {
 	if (flipVerticallyImage) {
 		stbi_set_flip_vertically_on_load(true);
 	}
@@ -33,9 +34,85 @@ TextureHandler::TextureHandler(const char* fileName, bool flipVerticallyImage, b
 	}
 	stbi_image_free(imageData);
 }
-TextureHandler::~TextureHandler() {
+Texture::TextureHandler::~TextureHandler() {
 	glDeleteTextures(1, &imageId);
 }
-const unsigned int TextureHandler::getTextureId() const {
+const unsigned int Texture::TextureHandler::getTextureId() const {
 	return imageId;
 }
+//..Texture handler code end
+
+//..Cube texture handler code start
+Texture::CubeTextureHandler::CubeTextureHandler(const char* skyBoxFolderPath) {
+	glGenTextures(1, &m_cubeTextureId);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeTextureId);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < m_Faces.size(); i++) {
+		std::string fileName = skyBoxFolderPath + m_Faces[i] + ".jpg";
+		unsigned char* imageData = stbi_load(
+			fileName.c_str(),
+			&width,
+			&height,
+			&nrChannels,
+			0
+		);
+		if (imageData) {
+			glTexImage2D(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0,
+				GL_RGB,
+				width,
+				height,
+				0,
+				GL_RGB,
+				GL_UNSIGNED_BYTE,
+				imageData
+			);
+			stbi_image_free(imageData);
+		}
+		else {
+			const std::string info =
+				"Failed to load the texture \n"
+				"Please check the path \n"
+				"IMPORTANT::(current application only accecpts the JPG format file)\n"
+				"File path::" + fileName;
+			std::cout << info << std::endl;
+			stbi_image_free(imageData);
+		}
+	}
+	glTexParameteri(
+		GL_TEXTURE_CUBE_MAP,
+		GL_TEXTURE_MIN_FILTER,
+		GL_LINEAR
+	);
+	glTexParameteri(
+		GL_TEXTURE_CUBE_MAP,
+		GL_TEXTURE_MAG_FILTER,
+		GL_LINEAR
+	);
+	glTexParameteri(
+		GL_TEXTURE_CUBE_MAP,
+		GL_TEXTURE_WRAP_S,
+		GL_CLAMP_TO_EDGE
+	);
+	glTexParameteri(
+		GL_TEXTURE_CUBE_MAP,
+		GL_TEXTURE_WRAP_T,
+		GL_CLAMP_TO_EDGE
+	);
+	glTexParameteri(
+		GL_TEXTURE_CUBE_MAP,
+		GL_TEXTURE_WRAP_R,
+		GL_CLAMP_TO_EDGE
+	);
+}
+
+Texture::CubeTextureHandler::~CubeTextureHandler() {
+	glDeleteTextures(1, &m_cubeTextureId);
+}
+
+const unsigned int Texture::CubeTextureHandler::getCubeTextureId() const {
+	return m_cubeTextureId;
+}
+//..Cube texture handler code end

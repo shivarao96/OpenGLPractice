@@ -19,7 +19,7 @@ namespace Mesh {
 	struct TextureInfo
 	{
 	public:
-		TextureHandler* texture;
+		Texture::TextureHandler* texture;
 		std::string type;
 		std::string path;
 
