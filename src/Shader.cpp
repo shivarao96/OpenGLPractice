@@ -1,19 +1,21 @@
 #include "Shader.h"
-#include <glad/glad.h>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include "Utils.h"
 
 
-Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath) {	
+Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath, const char* geometryShaderPath) {
 	if (Utils::checkFile(vertexShaderPath) && Utils::checkFile(fragmentShaderPath)) {
 		std::string vertexCode;
 		std::string fragmentCode;
+		std::string geometryCode;
 		std::ifstream fVetexFile;
 		std::ifstream fFragmentFile;
+		std::ifstream fGeometryFile;
 		fVetexFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		fFragmentFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		fGeometryFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		try {
 			fVetexFile.open(vertexShaderPath);
 			fFragmentFile.open(fragmentShaderPath);
@@ -24,6 +26,14 @@ Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath) {
 			fFragmentFile.close();
 			vertexCode = vertexStream.str();
 			fragmentCode = fragmentStream.str();
+
+			if (geometryShaderPath != nullptr) {
+				fGeometryFile.open(geometryShaderPath);
+				std::stringstream geometryFileStream;
+				geometryFileStream << fGeometryFile.rdbuf();
+				fGeometryFile.close();
+				geometryCode = geometryFileStream.str();
+			}
 		}
 		catch (std::ifstream::failure& e) {
 			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ"<< e.what() << std::endl;
@@ -31,7 +41,13 @@ Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath) {
 
 		unsigned int vertexShaderId = setUpShader(SHADERTYPE::VERTEX, vertexCode.c_str(), vertexShaderPath);
 		unsigned int fragmentShaderId = setUpShader(SHADERTYPE::FRAGMENT, fragmentCode.c_str(), fragmentShaderPath);
-		setUpShaderProgram(vertexShaderId, fragmentShaderId);
+		if (geometryShaderPath != nullptr) {
+			unsigned int geometricShaderId = setUpShader(SHADERTYPE::GEOMETRY, geometryCode.c_str(), geometryShaderPath);
+			setUpShaderProgram(vertexShaderId, fragmentShaderId, geometricShaderId);
+		}
+		else {
+			setUpShaderProgram(vertexShaderId, fragmentShaderId);
+		}
 	}
 }
 Shader::~Shader() {
@@ -71,8 +87,7 @@ void Shader::setVec4(const std::string& name, const glm::vec4& val) {
 	glUniform4fv(glGetUniformLocation(shaderProgramId, name.c_str()), 1, &val[0]);
 }
 unsigned int Shader::setUpShader(SHADERTYPE type, const char* shaderCode, const std::string& fileName) {
-	GLenum shaderType = (type == SHADERTYPE::VERTEX) ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
-	unsigned int shaderId = glCreateShader(shaderType);
+	unsigned int shaderId = glCreateShader((GLenum)type);
 	glShaderSource(shaderId, 1, &shaderCode, NULL);
 	glCompileShader(shaderId);
 	int shaderStatus;
@@ -84,10 +99,13 @@ unsigned int Shader::setUpShader(SHADERTYPE type, const char* shaderCode, const 
 	}
 	return shaderId;
 }
-void Shader::setUpShaderProgram(unsigned int vertexShader, unsigned int fragmentShader) {
+void Shader::setUpShaderProgram(unsigned int vertexShader, unsigned int fragmentShader, unsigned int geometricShader) {
 	shaderProgramId = glCreateProgram();
 	glAttachShader(shaderProgramId, vertexShader);
 	glAttachShader(shaderProgramId, fragmentShader);
+	if (geometricShader != -1) {
+		glAttachShader(shaderProgramId, geometricShader);
+	}
 	glLinkProgram(shaderProgramId);
 
 	int programLinkStatus;
@@ -99,4 +117,7 @@ void Shader::setUpShaderProgram(unsigned int vertexShader, unsigned int fragment
 	}
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+	if (geometricShader != -1) {
+		glDeleteShader(geometricShader);
+	}
 }

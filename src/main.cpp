@@ -118,122 +118,19 @@ void processInputs() {
 }
 void renderStuff() {
 	//..cube mesh
-	/*Shader cubeShader("./shaders/Model.vert", "./shaders/Model.frag");
+	Shader cubeShader("./shaders/Model.vert", "./shaders/Model.frag");
 	std::vector<Mesh::TextureInfo> cubeTextures;
 	Mesh::TextureInfo cubeTexture1;
 	cubeTexture1.texture = new Texture::TextureHandler("./assets/textures/grass-cube.png", false);
 	cubeTexture1.type = "texture_diffuse";
 	cubeTextures.push_back(cubeTexture1);
-	Mesh::MeshConfig* cubeMesh = drawCube(cubeTextures);*/
-
-	Shader shaderRed("./shaders/advanced_glsl.vert", "./shaders/red_advance_glsl.frag");
-	Shader shaderBlue("./shaders/advanced_glsl.vert", "./shaders/blue_advance_glsl.frag");
-	Shader shaderGreen("./shaders/advanced_glsl.vert", "./shaders/green_advance_glsl.frag");
-	Shader shaderYellow("./shaders/advanced_glsl.vert", "./shaders/yellow_advance_glsl.frag");
-
-	float cubeVertices[] = {
-		// positions         
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-	};
-	unsigned int cubeVAO, cubeVBO;
-	glGenVertexArrays(1, &cubeVAO);
-	glGenBuffers(1, &cubeVBO);
-	glBindVertexArray(cubeVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-	unsigned int uniformBlockIndexRed = glGetUniformBlockIndex(shaderRed.getShaderId(), "Matrices");
-	unsigned int uniformBlockIndexBlue = glGetUniformBlockIndex(shaderBlue.getShaderId(), "Matrices");
-	unsigned int uniformBlockIndexGreen = glGetUniformBlockIndex(shaderGreen.getShaderId(), "Matrices");
-	unsigned int uniformBlockIndexYellow = glGetUniformBlockIndex(shaderYellow.getShaderId(), "Matrices");
-
-	glUniformBlockBinding(shaderRed.getShaderId(), uniformBlockIndexRed, 0);
-	glUniformBlockBinding(shaderBlue.getShaderId(), uniformBlockIndexBlue, 0);
-	glUniformBlockBinding(shaderGreen.getShaderId(), uniformBlockIndexGreen, 0);
-	glUniformBlockBinding(shaderYellow.getShaderId(), uniformBlockIndexYellow, 0);
-
-	unsigned int uboMatrices;
-	glGenBuffers(1, &uboMatrices);
-	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-	glBufferData(
-		GL_UNIFORM_BUFFER, 
-		2 * sizeof(glm::mat4), 
-		NULL, 
-		GL_STATIC_DRAW
-	);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	glBindBufferRange(
-		GL_UNIFORM_BUFFER,
-		0,
-		uboMatrices,
-		0,
-		2 * sizeof(glm::mat4)
-	);
-
-	glm::mat4 commonProjection = glm::perspective(
-		glm::radians(newCam.getZoomVal()),
-		screenWidth / screenHeight,
-		0.1f,
-		100.0f
-	);
-	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-	glBufferSubData(
-		GL_UNIFORM_BUFFER,
-		0,
-		sizeof(glm::mat4),
-		glm::value_ptr(commonProjection)
-	);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
+	Mesh::MeshConfig* cubeMesh = drawCube(cubeTextures);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -246,18 +143,15 @@ void renderStuff() {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 commonView = newCam.getViewMatrix();
-		glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-		glBufferSubData(
-			GL_UNIFORM_BUFFER,
-			sizeof(glm::mat4),
-			sizeof(glm::mat4),
-			glm::value_ptr(commonView)
+		glm::mat4 commonProjection = glm::perspective(
+			glm::radians(newCam.getZoomVal()),
+			screenWidth / screenHeight,
+			0.1f,
+			100.0f
 		);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-				
+		glm::mat4 commonView = newCam.getViewMatrix();
 
-		/*cubeShader.use();
+		cubeShader.use();
 		glm::mat4 model = glm::mat4(1.0f);
 		cubeShader.setMat4("view", commonView);
 		cubeShader.setMat4("projection", commonProjection);
@@ -265,32 +159,7 @@ void renderStuff() {
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, 0));
 		cubeShader.setMat4("model", model);
-		cubeMesh->drawMesh(cubeShader);*/
-
-		glBindVertexArray(cubeVAO);
-		shaderRed.use();
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f)); // move top-left
-		shaderRed.setMat4("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		// GREEN
-		shaderGreen.use();
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.75f, 0.75f, 0.0f)); // move top-right
-		shaderGreen.setMat4("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		// YELLOW
-		shaderYellow.use();
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-0.75f, -0.75f, 0.0f)); // move bottom-left
-		shaderYellow.setMat4("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		// BLUE
-		shaderBlue.use();
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.75f, -0.75f, 0.0f)); // move bottom-right
-		shaderBlue.setMat4("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		cubeMesh->drawMesh(cubeShader);
 
 
 		glfwSwapBuffers(window);

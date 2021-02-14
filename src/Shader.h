@@ -1,23 +1,25 @@
 #pragma once
+#include <glad/glad.h>
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 
 class Shader
 {
 private:
 	enum class SHADERTYPE
 	{
-		VERTEX = 0,
-		FRAGMENT = 1,
-		GEOMETRY = 2
+		VERTEX   = GL_VERTEX_SHADER,
+		FRAGMENT = GL_FRAGMENT_SHADER,
+		GEOMETRY = GL_GEOMETRY_SHADER
 	};
 	unsigned int shaderProgramId = NULL;
 	unsigned int setUpShader(SHADERTYPE type, const char* shaderCode, const std::string& fileName);
-	void setUpShaderProgram(unsigned int vertexShader, unsigned int fragmentShader);
+	void setUpShaderProgram(unsigned int vertexShader, unsigned int fragmentShader, unsigned int geometricShader = -1);
 public:
-	Shader(const char* vertexShaderPath, const char* fragmentShaderPath);
+	Shader(const char* vertexShaderPath, const char* fragmentShaderPath, const char* geometryShaderPath = nullptr);
 	~Shader();
 
 	void use();
