@@ -65,6 +65,10 @@
     <None Include="shaders\green_advance_glsl.frag" />
     <None Include="shaders\blue_advance_glsl.frag" />
     <None Include="shaders\yellow_advance_glsl.frag" />
+    <None Include="shaders\PixelDraw.vert" />
+    <None Include="shaders\PixelDraw.frag" />
+    <None Include="shaders\PixelDraw.geom" />
+    <None Include="shaders\Model.geom" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
