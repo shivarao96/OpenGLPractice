@@ -6,6 +6,8 @@
 #include "Camera.h"
 #include "TextureHandler.h"
 #include "Mesh.h"
+#include <cstdlib>
+#include "Model.h"
 
 //varibale declaration
 extern GLFWwindow* window = nullptr;
@@ -118,19 +120,57 @@ void processInputs() {
 }
 void renderStuff() {
 	//..cube mesh
-	Shader cubeShader("./shaders/Model.vert", "./shaders/Model.frag");
-	std::vector<Mesh::TextureInfo> cubeTextures;
-	Mesh::TextureInfo cubeTexture1;
-	cubeTexture1.texture = new Texture::TextureHandler("./assets/textures/grass-cube.png", false);
-	cubeTexture1.type = "texture_diffuse";
-	cubeTextures.push_back(cubeTexture1);
-	Mesh::MeshConfig* cubeMesh = drawCube(cubeTextures);
+	//Shader cubeShader("./shaders/Model.vert", "./shaders/Model.frag");
+	//std::vector<Mesh::TextureInfo> cubeTextures;
+	//Mesh::TextureInfo cubeTexture1;
+	//cubeTexture1.texture = new Texture::TextureHandler("./assets/textures/grass-cube.png", false);
+	//cubeTexture1.type = "texture_diffuse";
+	//cubeTextures.push_back(cubeTexture1);
+	//Mesh::MeshConfig* cubeMesh = drawCube(cubeTextures);
+
+	Shader modelShader("./shaders/Model.vert", "./shaders/Model.frag", "./shaders/Model.geom");
+	Model nanoSuit("./assets/objects/nanosuit/nanosuit.obj");
+
+	//Shader pixelShader("./shaders/PixelDraw.vert", "./shaders/PixelDraw.frag", "./shaders/PixelDraw.geom");
+
+	//float points[] = {
+	//	-0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
+	//	 0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
+	//	 0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+	//	-0.5f, -0.5f, 1.0f, 1.0f, 0.0f
+	//};
+	//unsigned int VAO, VBO;
+	//glGenVertexArrays(1, &VAO);
+	//glGenBuffers(1, &VBO);
+	//glBindVertexArray(VAO);
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(points), &points, GL_STATIC_DRAW);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(
+	//	0,
+	//	2,
+	//	GL_FLOAT,
+	//	GL_FALSE,
+	//	5 * sizeof(float),
+	//	(void*)0
+	//);
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(
+	//	1,
+	//	3,
+	//	GL_FLOAT,
+	//	GL_FALSE,
+	//	5 * sizeof(float),
+	//	(void*)(2 * sizeof(float))
+	//);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+
+	glEnable(GL_PROGRAM_POINT_SIZE);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -150,26 +190,39 @@ void renderStuff() {
 			100.0f
 		);
 		glm::mat4 commonView = newCam.getViewMatrix();
+		glm::mat4 model = glm::mat4(1.0);
+		model = glm::scale(model, glm::vec3(0.3, 0.3, 0.3));
 
-		cubeShader.use();
-		glm::mat4 model = glm::mat4(1.0f);
-		cubeShader.setMat4("view", commonView);
-		cubeShader.setMat4("projection", commonProjection);
+		modelShader.use();
+		modelShader.setMat4("view", commonView);
+		modelShader.setMat4("model", model);
+		modelShader.setMat4("projection", commonProjection);
+		modelShader.setFloat("time", glfwGetTime());
 
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0, 0, 0));
-		cubeShader.setMat4("model", model);
-		cubeMesh->drawMesh(cubeShader);
+		nanoSuit.drawModel(modelShader);
 
+		//cubeShader.use();
+		//glm::mat4 model = glm::mat4(1.0f);
+		//cubeShader.setMat4("view", commonView);
+		//cubeShader.setMat4("projection", commonProjection);
+
+		//model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(0, 0, 0));
+		//cubeShader.setMat4("model", model);
+		//cubeMesh->drawMesh(cubeShader);
+		//..pixel drawing
+		//pixelShader.use();
+		//glBindVertexArray(VAO);
+		//glDrawArrays(GL_POINTS, 0, 4);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	/*delete cubeMesh;
-	for (unsigned int i = 0; i < cubeTextures.size(); i++) {
-		delete cubeTextures[i].texture;
-	}*/
+	//delete cubeMesh;
+	//for (unsigned int i = 0; i < cubeTextures.size(); i++) {
+	//	delete cubeTextures[i].texture;
+	//}
 }
 void mouseCallback(GLFWwindow* window, double xPos, double yPos) {
 	if (isFirstMouseEvent) {
