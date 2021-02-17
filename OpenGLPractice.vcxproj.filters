@@ -69,6 +69,12 @@
     <None Include="shaders\PixelDraw.frag" />
     <None Include="shaders\PixelDraw.geom" />
     <None Include="shaders\Model.geom" />
+    <None Include="shaders\DebugQuad.vert" />
+    <None Include="shaders\DebugQuad.frag" />
+    <None Include="shaders\ShadowMappingDepth.vert" />
+    <None Include="shaders\ShadowMappingDepth.frag" />
+    <None Include="shaders\ShadowMapping.vert" />
+    <None Include="shaders\ShadowMapping.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">

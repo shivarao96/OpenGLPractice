@@ -162,6 +162,8 @@
     <None Include="shaders\blue_advance_glsl.frag" />
     <None Include="shaders\container.frag" />
     <None Include="shaders\container.vert" />
+    <None Include="shaders\DebugQuad.frag" />
+    <None Include="shaders\DebugQuad.vert" />
     <None Include="shaders\Fragment.frag" />
     <None Include="shaders\FrameBuffer.frag" />
     <None Include="shaders\FrameBuffer.vert" />
@@ -178,6 +180,10 @@
     <None Include="shaders\PixelDraw.vert" />
     <None Include="shaders\red_advance_glsl.frag" />
     <None Include="shaders\Shader.vert" />
+    <None Include="shaders\ShadowMapping.frag" />
+    <None Include="shaders\ShadowMapping.vert" />
+    <None Include="shaders\ShadowMappingDepth.frag" />
+    <None Include="shaders\ShadowMappingDepth.vert" />
     <None Include="shaders\SkyBox.frag" />
     <None Include="shaders\SkyBox.vert" />
     <None Include="shaders\yellow_advance_glsl.frag" />
